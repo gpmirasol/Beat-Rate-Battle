@@ -17,6 +17,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        stage = new Stage(new ScreenViewport());
         System.out.println("Song Select Screen");
     }
 
@@ -28,6 +29,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        if (stage == null) return;
         stage.getViewport().update(width, height, true);
     }
 

@@ -41,8 +41,8 @@ public class ResultsScreen implements Screen {
         // SPRITES (PLACEHOLDERS)
         // =========================
 
-        Image p1Sprite = new Image(new Texture("p1.png"));
-        Image p2Sprite = new Image(new Texture("p2.png"));
+        Image p1Sprite = new Image(new Texture("bg.png"));
+        Image p2Sprite = new Image(new Texture("bg.png"));
 
         // =========================
         // STATS TABLE (CENTER)

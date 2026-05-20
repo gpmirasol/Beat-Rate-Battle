@@ -17,6 +17,9 @@ public class CharacterSelectScreen implements Screen {
 
     @Override
     public void show() {
+        stage = new Stage(new ScreenViewport());
+        Gdx.input.setInputProcessor(stage);
+
         System.out.println("Character Select Screen");
     }
 
@@ -28,6 +31,7 @@ public class CharacterSelectScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        if (stage == null) return;
         stage.getViewport().update(width, height, true);
     }
 

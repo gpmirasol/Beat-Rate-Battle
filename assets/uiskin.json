@@ -21,7 +21,6 @@
     default: {
       up: default-round,
       down: default-round-down,
-      "__note": "normal button = up, down = pressed, checked = toggle / hover"
     }
   },
   com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {

@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -19,6 +21,7 @@ public class CharacterSelectScreen implements Screen {
 
     private Stage stage;
     private Skin skin;
+    private Image background;
 
     private Table rootTable;
 
@@ -47,6 +50,12 @@ public class CharacterSelectScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        Texture bgTexture = new Texture(Gdx.files.internal("CharacterSelectScreenBg.png"));
+        background = new Image(bgTexture);
+        background.setFillParent(true);
+
+        stage.addActor(background);
 
         rootTable = new Table();
         rootTable.setFillParent(true);

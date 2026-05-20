@@ -105,8 +105,15 @@ public class CharacterSelectScreen implements Screen {
 
         // battle banner
         battleBanner = new Label("GET READY FOR BATTLE", skin);
-        battleBanner.setVisible(false); // set visible true in logic part upon pressing "enter"
         battleBanner.setAlignment(Align.center);
+        battleBanner.setVisible(false); // ‼️‼️‼️ @kevin set visible true in logic part upon pressing "enter"
+
+        battleBanner.setPosition(
+            Gdx.graphics.getWidth() / 2f - 180,
+            Gdx.graphics.getHeight() / 2f
+        );
+
+        stage.addActor(battleBanner);
 
         // MAIN LAYOUT
         // TOP PREVIEW ROW
@@ -140,15 +147,6 @@ public class CharacterSelectScreen implements Screen {
             .right()
             .padRight(50)
             .padBottom(50);
-
-        rootTable.row();
-
-        // BATTLE BANNER
-        rootTable.add(battleBanner)
-            .colspan(2)
-            .center()
-            .padBottom(20);
-
 
         System.out.println("Character Select Screen");
     }

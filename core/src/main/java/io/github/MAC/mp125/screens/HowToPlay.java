@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class HowToPlayScreen implements Screen {
+public class HowToPlay implements Screen {
 
     private Game game;
     private Stage stage;
@@ -26,12 +26,12 @@ public class HowToPlayScreen implements Screen {
     private int page = 0;
 
     private String[] slides = {
-        "howto1.png",
-        "howto2.png",
-        "howto3.png"
+        "howtoplay1.png",
+        "howtoplay2.png",
+        "howtoplay3.png"
     };
 
-    public HowToPlayScreen(Game game) {
+    public HowToPlay(Game game) {
         this.game = game;
     }
 

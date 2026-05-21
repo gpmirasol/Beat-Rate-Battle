@@ -2,7 +2,6 @@ package io.github.MAC.mp125.notes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import io.github.MAC.mp125.notes.GameNote;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;

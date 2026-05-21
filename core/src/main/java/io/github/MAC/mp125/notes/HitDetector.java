@@ -5,14 +5,14 @@ public class HitDetector {
     // These are the timing windows in milliseconds (how early/late a player can
     // be).
     // You can adjust these numbers to make the game easier or harder!
-    public static final int WINDOW_MARVELOUS = 22;
-    public static final int WINDOW_PERFECT = 45;
-    public static final int WINDOW_GREAT = 90;
-    public static final int WINDOW_GOOD = 135;
+    public static final int WINDOW_PERFECT = 22;
+    public static final int WINDOW_AMAZING = 45;
+    public static final int WINDOW_GOOD = 90;
+    public static final int WINDOW_MEH = 135;
     public static final int WINDOW_BAD = 180;
 
     public enum HitGrade {
-        MARVELOUS, PERFECT, GREAT, GOOD, BAD, MISS, NONE
+        PERFECT, AMAZING, GOOD, MEH, BAD, MISS, NONE
     }
 
     /**
@@ -25,14 +25,14 @@ public class HitDetector {
     public static HitGrade evaluateHit(long targetTimeMs, long currentSongTimeMs) {
         long timeDifference = Math.abs(targetTimeMs - currentSongTimeMs);
 
-        if (timeDifference <= WINDOW_MARVELOUS)
-            return HitGrade.MARVELOUS;
         if (timeDifference <= WINDOW_PERFECT)
             return HitGrade.PERFECT;
-        if (timeDifference <= WINDOW_GREAT)
-            return HitGrade.GREAT;
+        if (timeDifference <= WINDOW_AMAZING)
+            return HitGrade.AMAZING;
         if (timeDifference <= WINDOW_GOOD)
             return HitGrade.GOOD;
+        if (timeDifference <= WINDOW_MEH)
+            return HitGrade.MEH;
         if (timeDifference <= WINDOW_BAD)
             return HitGrade.BAD;
 

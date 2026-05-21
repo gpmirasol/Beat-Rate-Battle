@@ -18,7 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation;
-
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Iterator;
+import io.github.MAC.mp125.notes.GameNote;
+import io.github.MAC.mp125.notes.smParser;
+import io.github.MAC.mp125.notes.HitDetector;
+import io.github.MAC.mp125.notes.HitDetector.HitGrade;
 public class GameScreen implements Screen {
     private Game game;
     private Stage stage;
@@ -27,6 +33,16 @@ public class GameScreen implements Screen {
     private ProgressBar healthBar;
     private ProgressBar progressBar;
     private float health = 50f;
+
+    // Note Tracking
+    private ConcurrentLinkedQueue<GameNote> p1Notes;
+    private ConcurrentLinkedQueue<GameNote> p2Notes;
+    private long currentSongTimeMs = 0;
+    private ShapeRenderer shapeRenderer;
+    private float receptorY = 600f; // Near top of screen
+    private float laneWidth = 60f;
+    private float noteSize = 50f;
+    private float scrollSpeedFactor = 0.5f;
 
     // Animation fields
     private static final int FRAME_COLS = 3, FRAME_ROWS = 3; // Adjust based on actual sprite sheet
@@ -159,6 +175,11 @@ public class GameScreen implements Screen {
         progressBar.setValue(50f);
         rootTable.add(progressBar).colspan(3).expand().fillX().bottom().pad(50);
 
+        // Init Notes and Renderer
+        shapeRenderer = new ShapeRenderer();
+        p1Notes = smParser.parseChart("Gentleman.sm", 1);
+        p2Notes = smParser.parseChart("Gentleman.sm", 2);
+
         System.out.println("Game Screen Started");
     }
 
@@ -171,46 +192,94 @@ public class GameScreen implements Screen {
         return Gdx.input.isKeyJustPressed(keycode);
     }
 
+    private void processHitAttempt(ConcurrentLinkedQueue<GameNote> notes, int laneIndex, boolean isP1) {
+        Iterator<GameNote> iterator = notes.iterator();
+        while (iterator.hasNext()) {
+            GameNote note = iterator.next();
+            if (note.laneIndex == laneIndex) {
+                HitGrade grade = HitDetector.evaluateHit(note.targetTimeMs, currentSongTimeMs);
+                if (grade != HitGrade.NONE && grade != HitGrade.MISS) {
+                    iterator.remove();
+                    int points = 0;
+                    float hpChange = 0;
+                    switch(grade) {
+                        case PERFECT: points = 50; hpChange = 2f; break;
+                        case AMAZING: points = 40; hpChange = 1.5f; break;
+                        case GOOD:    points = 30; hpChange = 1f; break;
+                        case MEH:     points = 10; hpChange = 0.5f; break;
+                        case BAD:     points = 0; hpChange = 0f; break;
+                        default: break;
+                    }
+                    if (isP1) {
+                        p1Score += points;
+                        health += hpChange;
+                    } else {
+                        p2Score += points;
+                        health -= hpChange;
+                    }
+                    return; // Hit processed, don't hit multiple notes at once
+                }
+            }
+        }
+    }
+
+    private void updateAndDrawNotes(ConcurrentLinkedQueue<GameNote> notes, float startX, boolean isP1) {
+        Iterator<GameNote> iterator = notes.iterator();
+        while (iterator.hasNext()) {
+            GameNote note = iterator.next();
+            if (HitDetector.hasMissed(note.targetTimeMs, currentSongTimeMs)) {
+                iterator.remove();
+                if (isP1) health -= 2f; // P1 misses
+                else health += 2f; // P2 misses
+                continue;
+            }
+
+            float timeRemaining = note.targetTimeMs - currentSongTimeMs;
+            float noteY = receptorY - (timeRemaining * scrollSpeedFactor);
+
+            // Draw if it's on screen
+            if (noteY > -noteSize && noteY < Gdx.graphics.getHeight()) {
+                switch(note.laneIndex) {
+                    case 0: shapeRenderer.setColor(Color.PURPLE); break;
+                    case 1: shapeRenderer.setColor(Color.CYAN); break;
+                    case 2: shapeRenderer.setColor(Color.GREEN); break;
+                    case 3: shapeRenderer.setColor(Color.RED); break;
+                    default: shapeRenderer.setColor(Color.WHITE); break;
+                }
+                float noteX = startX + (note.laneIndex * laneWidth);
+                shapeRenderer.rect(noteX, noteY, noteSize, noteSize);
+            }
+        }
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Update P1 Keys (Moves health right)
-        if (updateButtonState(wBtn, Input.Keys.W)) {
-            health += 2f;
-            p1Score += 20;
-        }
-        if (updateButtonState(aBtn, Input.Keys.A)) {
-            health += 2f;
-            p1Score += 20;
-        }
-        if (updateButtonState(sBtn, Input.Keys.S)) {
-            health += 2f;
-            p1Score += 20;
-        }
-        if (updateButtonState(dBtn, Input.Keys.D)) {
-            health += 2f;
-            p1Score += 20;
-        }
+        currentSongTimeMs += (long)(delta * 1000);
 
-        // Update P2 Keys (Moves health left)
-        if (updateButtonState(upBtn, Input.Keys.UP)) {
-            health -= 2f;
-            p2Score += 20;
-        }
-        if (updateButtonState(leftBtn, Input.Keys.LEFT)) {
-            health -= 2f;
-            p2Score += 20;
-        }
-        if (updateButtonState(downBtn, Input.Keys.DOWN)) {
-            health -= 2f;
-            p2Score += 20;
-        }
-        if (updateButtonState(rightBtn, Input.Keys.RIGHT)) {
-            health -= 2f;
-            p2Score += 20;
-        }
+        // Update P1 Keys
+        boolean wPressed = updateButtonState(wBtn, Input.Keys.W);
+        boolean aPressed = updateButtonState(aBtn, Input.Keys.A);
+        boolean sPressed = updateButtonState(sBtn, Input.Keys.S);
+        boolean dPressed = updateButtonState(dBtn, Input.Keys.D);
+
+        if (aPressed) processHitAttempt(p1Notes, 0, true);
+        if (sPressed) processHitAttempt(p1Notes, 1, true);
+        if (wPressed) processHitAttempt(p1Notes, 2, true);
+        if (dPressed) processHitAttempt(p1Notes, 3, true);
+
+        // Update P2 Keys
+        boolean upPressed = updateButtonState(upBtn, Input.Keys.UP);
+        boolean leftPressed = updateButtonState(leftBtn, Input.Keys.LEFT);
+        boolean downPressed = updateButtonState(downBtn, Input.Keys.DOWN);
+        boolean rightPressed = updateButtonState(rightBtn, Input.Keys.RIGHT);
+
+        if (leftPressed) processHitAttempt(p2Notes, 0, false);
+        if (downPressed) processHitAttempt(p2Notes, 1, false);
+        if (upPressed) processHitAttempt(p2Notes, 2, false);
+        if (rightPressed) processHitAttempt(p2Notes, 3, false);
 
         p1ScoreLabel.setText("Score: " + p1Score);
         p2ScoreLabel.setText("Score: " + p2Score);
@@ -275,6 +344,27 @@ public class GameScreen implements Screen {
 
         stage.act(delta);
         stage.draw();
+
+        // Draw Notes and Receptors over the stage
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        // Draw Receptors (Hollow)
+        float p1StartX = Gdx.graphics.getWidth() * 0.1f;
+        float p2StartX = Gdx.graphics.getWidth() * 0.7f;
+        
+        // Adjust receptor height dynamically based on screen size
+        receptorY = Gdx.graphics.getHeight() - 100f;
+
+        shapeRenderer.setColor(Color.WHITE);
+        for(int i = 0; i < 4; i++) {
+            shapeRenderer.rect(p1StartX + (i * laneWidth), receptorY, noteSize, noteSize);
+            shapeRenderer.rect(p2StartX + (i * laneWidth), receptorY, noteSize, noteSize);
+        }
+        shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        updateAndDrawNotes(p1Notes, p1StartX, true);
+        updateAndDrawNotes(p2Notes, p2StartX, false);
+        shapeRenderer.end();
     }
 
     @Override
@@ -312,6 +402,9 @@ public class GameScreen implements Screen {
         }
         if (p2SpriteSheet != null) {
             p2SpriteSheet.dispose();
+        }
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
         }
 
     }

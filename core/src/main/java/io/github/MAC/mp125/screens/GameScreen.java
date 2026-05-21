@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -25,6 +26,7 @@ import io.github.MAC.mp125.notes.GameNote;
 import io.github.MAC.mp125.notes.smParser;
 import io.github.MAC.mp125.notes.HitDetector;
 import io.github.MAC.mp125.notes.HitDetector.HitGrade;
+
 public class GameScreen implements Screen {
     private Game game;
     private Stage stage;
@@ -43,6 +45,9 @@ public class GameScreen implements Screen {
     private float laneWidth = 60f;
     private float noteSize = 50f;
     private float scrollSpeedFactor = 0.5f;
+
+    private Music backgroundMusic;
+    private String songName;
 
     // Animation fields
     private static final int FRAME_COLS = 3, FRAME_ROWS = 3; // Adjust based on actual sprite sheet
@@ -66,8 +71,9 @@ public class GameScreen implements Screen {
     // P2 Keys
     private TextButton upBtn, leftBtn, downBtn, rightBtn;
 
-    public GameScreen(Game game) {
+    public GameScreen(Game game, String songName) {
         this.game = game;
+        this.songName = songName;
     }
 
     @Override
@@ -177,8 +183,15 @@ public class GameScreen implements Screen {
 
         // Init Notes and Renderer
         shapeRenderer = new ShapeRenderer();
-        p1Notes = smParser.parseChart("Gentleman.sm", 1);
-        p2Notes = smParser.parseChart("Gentleman.sm", 2);
+
+        // Load and play music
+        if (Gdx.files.internal(songName + ".wav").exists()) {
+            backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(songName + ".wav"));
+            backgroundMusic.play();
+        }
+
+        p1Notes = smParser.parseChart(songName + ".sm", 1);
+        p2Notes = smParser.parseChart(songName + ".sm", 2);
 
         System.out.println("Game Screen Started");
     }
@@ -202,13 +215,29 @@ public class GameScreen implements Screen {
                     iterator.remove();
                     int points = 0;
                     float hpChange = 0;
-                    switch(grade) {
-                        case PERFECT: points = 50; hpChange = 2f; break;
-                        case AMAZING: points = 40; hpChange = 1.5f; break;
-                        case GOOD:    points = 30; hpChange = 1f; break;
-                        case MEH:     points = 10; hpChange = 0.5f; break;
-                        case BAD:     points = 0; hpChange = 0f; break;
-                        default: break;
+                    switch (grade) {
+                        case PERFECT:
+                            points = 50;
+                            hpChange = 2f;
+                            break;
+                        case AMAZING:
+                            points = 40;
+                            hpChange = 1.5f;
+                            break;
+                        case GOOD:
+                            points = 30;
+                            hpChange = 1f;
+                            break;
+                        case MEH:
+                            points = 10;
+                            hpChange = 0.5f;
+                            break;
+                        case BAD:
+                            points = 0;
+                            hpChange = 0f;
+                            break;
+                        default:
+                            break;
                     }
                     if (isP1) {
                         p1Score += points;
@@ -229,8 +258,10 @@ public class GameScreen implements Screen {
             GameNote note = iterator.next();
             if (HitDetector.hasMissed(note.targetTimeMs, currentSongTimeMs)) {
                 iterator.remove();
-                if (isP1) health -= 2f; // P1 misses
-                else health += 2f; // P2 misses
+                if (isP1)
+                    health -= 2f; // P1 misses
+                else
+                    health += 2f; // P2 misses
                 continue;
             }
 
@@ -239,12 +270,22 @@ public class GameScreen implements Screen {
 
             // Draw if it's on screen
             if (noteY > -noteSize && noteY < Gdx.graphics.getHeight()) {
-                switch(note.laneIndex) {
-                    case 0: shapeRenderer.setColor(Color.PURPLE); break;
-                    case 1: shapeRenderer.setColor(Color.CYAN); break;
-                    case 2: shapeRenderer.setColor(Color.GREEN); break;
-                    case 3: shapeRenderer.setColor(Color.RED); break;
-                    default: shapeRenderer.setColor(Color.WHITE); break;
+                switch (note.laneIndex) {
+                    case 0:
+                        shapeRenderer.setColor(Color.PURPLE);
+                        break;
+                    case 1:
+                        shapeRenderer.setColor(Color.CYAN);
+                        break;
+                    case 2:
+                        shapeRenderer.setColor(Color.GREEN);
+                        break;
+                    case 3:
+                        shapeRenderer.setColor(Color.RED);
+                        break;
+                    default:
+                        shapeRenderer.setColor(Color.WHITE);
+                        break;
                 }
                 float noteX = startX + (note.laneIndex * laneWidth);
                 shapeRenderer.rect(noteX, noteY, noteSize, noteSize);
@@ -257,7 +298,12 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        currentSongTimeMs += (long)(delta * 1000);
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            // Synchronize note position using actual audio position
+            currentSongTimeMs = (long) (backgroundMusic.getPosition() * 1000);
+        } else {
+            currentSongTimeMs += (long) (delta * 1000);
+        }
 
         // Update P1 Keys
         boolean wPressed = updateButtonState(wBtn, Input.Keys.W);
@@ -265,10 +311,14 @@ public class GameScreen implements Screen {
         boolean sPressed = updateButtonState(sBtn, Input.Keys.S);
         boolean dPressed = updateButtonState(dBtn, Input.Keys.D);
 
-        if (aPressed) processHitAttempt(p1Notes, 0, true);
-        if (sPressed) processHitAttempt(p1Notes, 1, true);
-        if (wPressed) processHitAttempt(p1Notes, 2, true);
-        if (dPressed) processHitAttempt(p1Notes, 3, true);
+        if (aPressed)
+            processHitAttempt(p1Notes, 0, true);
+        if (sPressed)
+            processHitAttempt(p1Notes, 1, true);
+        if (wPressed)
+            processHitAttempt(p1Notes, 2, true);
+        if (dPressed)
+            processHitAttempt(p1Notes, 3, true);
 
         // Update P2 Keys
         boolean upPressed = updateButtonState(upBtn, Input.Keys.UP);
@@ -276,10 +326,14 @@ public class GameScreen implements Screen {
         boolean downPressed = updateButtonState(downBtn, Input.Keys.DOWN);
         boolean rightPressed = updateButtonState(rightBtn, Input.Keys.RIGHT);
 
-        if (leftPressed) processHitAttempt(p2Notes, 0, false);
-        if (downPressed) processHitAttempt(p2Notes, 1, false);
-        if (upPressed) processHitAttempt(p2Notes, 2, false);
-        if (rightPressed) processHitAttempt(p2Notes, 3, false);
+        if (leftPressed)
+            processHitAttempt(p2Notes, 0, false);
+        if (downPressed)
+            processHitAttempt(p2Notes, 1, false);
+        if (upPressed)
+            processHitAttempt(p2Notes, 2, false);
+        if (rightPressed)
+            processHitAttempt(p2Notes, 3, false);
 
         p1ScoreLabel.setText("Score: " + p1Score);
         p2ScoreLabel.setText("Score: " + p2Score);
@@ -340,6 +394,8 @@ public class GameScreen implements Screen {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new ResultsScreen(game));
+            dispose(); // Free up resources when leaving the screen
+            return; // Prevent further rendering with disposed resources
         }
 
         stage.act(delta);
@@ -350,12 +406,12 @@ public class GameScreen implements Screen {
         // Draw Receptors (Hollow)
         float p1StartX = Gdx.graphics.getWidth() * 0.1f;
         float p2StartX = Gdx.graphics.getWidth() * 0.7f;
-        
+
         // Adjust receptor height dynamically based on screen size
         receptorY = Gdx.graphics.getHeight() - 100f;
 
         shapeRenderer.setColor(Color.WHITE);
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             shapeRenderer.rect(p1StartX + (i * laneWidth), receptorY, noteSize, noteSize);
             shapeRenderer.rect(p2StartX + (i * laneWidth), receptorY, noteSize, noteSize);
         }
@@ -384,6 +440,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+        if (backgroundMusic != null) {
+            backgroundMusic.stop(); // Ensure music stops playing when the screen is hidden
+        }
     }
 
     @Override
@@ -405,6 +464,9 @@ public class GameScreen implements Screen {
         }
         if (shapeRenderer != null) {
             shapeRenderer.dispose();
+        }
+        if (backgroundMusic != null) {
+            backgroundMusic.dispose();
         }
 
     }

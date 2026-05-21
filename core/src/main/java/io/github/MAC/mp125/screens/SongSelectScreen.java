@@ -28,6 +28,9 @@ public class SongSelectScreen implements Screen {
     // remember song selection
     public static int selectedSongIndex = 0;
 
+    // song base names matching assets
+    private String[] songNames = { "Apple", "Beauty and a Beat", "Gentleman" };
+
     private Table rootTable;
 
     // full screen dynamic background (preview system)
@@ -69,9 +72,9 @@ public class SongSelectScreen implements Screen {
         stage.addActor(rootTable);
 
         // song buttons
-        song1Button = new TextButton("SONG 1", skin);
-        song2Button = new TextButton("SONG 2", skin);
-        song3Button = new TextButton("SONG 3", skin);
+        song1Button = new TextButton(songNames[0], skin);
+        song2Button = new TextButton(songNames[1], skin);
+        song3Button = new TextButton(songNames[2], skin);
 
         song1Button.setTouchable(Touchable.disabled);
         song2Button.setTouchable(Touchable.disabled);
@@ -133,7 +136,7 @@ public class SongSelectScreen implements Screen {
             song3Button.setColor(Color.GREEN);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            game.setScreen(new GameScreen(game));
+            game.setScreen(new GameScreen(game, songNames[selectedSongIndex]));
         }
 
         stage.act(delta);

@@ -17,14 +17,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-/** First screen of the application. Displayed after the application is created. */
+/**
+ * First screen of the application. Displayed after the application is created.
+ */
 public class MainMenuScreen implements Screen {
     private Stage stage;
     private Table table;
     private Image background;
 
-    private TextButton playButton; /** TextButton change to ImageButton later */
-    private TextButton howToPlayButton; /** TextButton change to ImageButton later */
+    private TextButton playButton;
+    /** TextButton change to ImageButton later */
+    private TextButton howToPlayButton;
+    /** TextButton change to ImageButton later */
 
     private Skin skin;
     private Game game;
@@ -53,7 +57,10 @@ public class MainMenuScreen implements Screen {
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         playButton = new TextButton("Play", skin); /** change to "playButton = new ImageButton(skin);" later */
-        howToPlayButton = new TextButton("How to Play", skin); /** change to "howToPlayButton = new ImageButton(skin);" later */
+        howToPlayButton = new TextButton("How to Play", skin); /**
+                                                                * change to "howToPlayButton = new ImageButton(skin);"
+                                                                * later
+                                                                */
 
         table.add(playButton).width(250).height(80).pad(10);
         table.row();
@@ -76,7 +83,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        // Draw your screen here. "delta" is the time since last render in seconds.
+        // Draw screen here, "delta" is the time since last render in seconds.
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -90,10 +97,12 @@ public class MainMenuScreen implements Screen {
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
     public void hide() {
@@ -102,7 +111,6 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void dispose() {
-        // Destroy screen's assets here.
         stage.dispose();
         skin.dispose();
     }

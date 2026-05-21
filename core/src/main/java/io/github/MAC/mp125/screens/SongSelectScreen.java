@@ -14,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -21,6 +24,9 @@ public class SongSelectScreen implements Screen {
     private Game game;
     private Stage stage;
     private Skin skin;
+
+    // remember song selection
+    public static int selectedSongIndex = 0;
 
     private Table rootTable;
 
@@ -67,16 +73,9 @@ public class SongSelectScreen implements Screen {
         song2Button = new TextButton("SONG 2", skin);
         song3Button = new TextButton("SONG 3", skin);
 
-        ChangeListener playListener = new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new GameScreen(game));
-            }
-        };
-
-        song1Button.addListener(playListener);
-        song2Button.addListener(playListener);
-        song3Button.addListener(playListener);
+        song1Button.setTouchable(Touchable.disabled);
+        song2Button.setTouchable(Touchable.disabled);
+        song3Button.setTouchable(Touchable.disabled);
 
         Table songBar = new Table();
 
@@ -111,7 +110,29 @@ public class SongSelectScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ENTER)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            selectedSongIndex--;
+            if (selectedSongIndex < 0)
+                selectedSongIndex = 2;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            selectedSongIndex++;
+            if (selectedSongIndex > 2)
+                selectedSongIndex = 0;
+        }
+
+        song1Button.setColor(Color.WHITE);
+        song2Button.setColor(Color.WHITE);
+        song3Button.setColor(Color.WHITE);
+
+        if (selectedSongIndex == 0)
+            song1Button.setColor(Color.GREEN);
+        else if (selectedSongIndex == 1)
+            song2Button.setColor(Color.GREEN);
+        else if (selectedSongIndex == 2)
+            song3Button.setColor(Color.GREEN);
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             game.setScreen(new GameScreen(game));
         }
 
@@ -144,8 +165,3 @@ public class SongSelectScreen implements Screen {
         skin.dispose();
     }
 }
-
-// todo: kevin can implement songPreviewBackground.setDrawable(...) safely
-// todo: or later upgrade to fade transitions, shader effects without touching
-// UI layout :DD yay
-// todo: smooth fade between images (optional)

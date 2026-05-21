@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Input;
@@ -48,7 +50,7 @@ public class CharacterSelectScreen implements Screen {
 
     // Sprite carousel fields | TODO: @grace Change colors to sprite assets
     private Image p1Sprite, p2Sprite;
-    private Color[] colors = { Color.RED, Color.GREEN, Color.BLUE };
+    private Texture[] characterSprites;
     private int p1SpriteIndex = 0;
     private int p2SpriteIndex = 0;
 
@@ -142,14 +144,14 @@ public class CharacterSelectScreen implements Screen {
         rootTable.row();
 
         // SPRITE PREVIEWS (Instead of empty space)
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        Texture whiteTexture = new Texture(pixmap);
-        pixmap.dispose();
+        characterSprites = new Texture[] {
+            new Texture(Gdx.files.internal("default.png")),
+            new Texture(Gdx.files.internal("howtoplay1.png")),
+            new Texture(Gdx.files.internal("howtoplay2.png"))
+        };
 
-        p1Sprite = new Image(whiteTexture);
-        p2Sprite = new Image(whiteTexture);
+        p1Sprite = new Image(characterSprites[0]);
+        p2Sprite = new Image(characterSprites[0]);
 
         rootTable.add(p1Sprite).width(200).height(200).expandX().center();
         rootTable.add(p2Sprite).width(200).height(200).expandX().center();
@@ -178,32 +180,32 @@ public class CharacterSelectScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // P1 Color Carousel
+        // P1 Image Carousel
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             p1SpriteIndex--;
             if (p1SpriteIndex < 0)
-                p1SpriteIndex = colors.length - 1;
-            p1Sprite.setColor(colors[p1SpriteIndex]);
+                p1SpriteIndex = characterSprites.length - 1;
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p1SpriteIndex])));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
             p1SpriteIndex++;
-            if (p1SpriteIndex >= colors.length)
+            if (p1SpriteIndex >= characterSprites.length)
                 p1SpriteIndex = 0;
-            p1Sprite.setColor(colors[p1SpriteIndex]);
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p1SpriteIndex])));
         }
 
-        // P2 Color Carousel
+        // P2 Image Carousel
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             p2SpriteIndex--;
             if (p2SpriteIndex < 0)
-                p2SpriteIndex = colors.length - 1;
-            p2Sprite.setColor(colors[p2SpriteIndex]);
+                p2SpriteIndex = characterSprites.length - 1;
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p2SpriteIndex])));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
             p2SpriteIndex++;
-            if (p2SpriteIndex >= colors.length)
+            if (p2SpriteIndex >= characterSprites.length)
                 p2SpriteIndex = 0;
-            p2Sprite.setColor(colors[p2SpriteIndex]);
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p2SpriteIndex])));
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
@@ -240,5 +242,10 @@ public class CharacterSelectScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        if (characterSprites != null) {
+            for (Texture tex : characterSprites) {
+                tex.dispose();
+            }
+        }
     }
 }

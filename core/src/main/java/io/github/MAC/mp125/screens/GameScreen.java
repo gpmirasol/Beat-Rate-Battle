@@ -15,7 +15,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class GameScreen implements Screen {
     private Game game;
     private Stage stage;
@@ -25,7 +26,7 @@ public class GameScreen implements Screen {
     private ProgressBar progressBar;
     private float health = 50f;
 
-    private Texture defaultTexture;
+    private Texture[] actionSprites;
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
@@ -91,9 +92,14 @@ public class GameScreen implements Screen {
 
         // Placeholders for player sprites | TODO: @grace Change Image/s for Sprites
         rootTable.row();
-        defaultTexture = new Texture(Gdx.files.internal("default.png"));
-        p1Sprite = new Image(defaultTexture);
-        p2Sprite = new Image(defaultTexture);
+        actionSprites = new Texture[] {
+            new Texture(Gdx.files.internal("default.png")),
+            new Texture(Gdx.files.internal("howtoplay1.png")),
+            new Texture(Gdx.files.internal("howtoplay2.png")),
+            new Texture(Gdx.files.internal("howtoplay3.png"))
+        };
+        p1Sprite = new Image(actionSprites[0]);
+        p2Sprite = new Image(actionSprites[0]);
 
         rootTable.add(p1Sprite).width(150).height(150).expand().center();
         rootTable.add().expand().center(); // spacer for the middle column
@@ -175,25 +181,27 @@ public class GameScreen implements Screen {
         healthBar.setValue(health);
 
         //TODO: @grace Update Placeholder Sprite with Images
-        p1Sprite.setColor(Color.WHITE);
         if (Gdx.input.isKeyPressed(Input.Keys.W))
-            p1Sprite.setColor(Color.RED);
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
         else if (Gdx.input.isKeyPressed(Input.Keys.A))
-            p1Sprite.setColor(Color.GREEN);
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[2])));
         else if (Gdx.input.isKeyPressed(Input.Keys.S))
-            p1Sprite.setColor(Color.BLUE);
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[3])));
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
-            p1Sprite.setColor(Color.YELLOW);
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
+        else
+            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[0])));
 
-        p2Sprite.setColor(Color.WHITE);
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            p2Sprite.setColor(Color.RED);
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
         else if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            p2Sprite.setColor(Color.GREEN);
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[2])));
         else if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            p2Sprite.setColor(Color.BLUE);
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[3])));
         else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            p2Sprite.setColor(Color.YELLOW);
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
+        else
+            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[0])));
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new ResultsScreen(game));
@@ -230,7 +238,10 @@ public class GameScreen implements Screen {
             skin.dispose();
         if (bgTexture != null)
             bgTexture.dispose();
-        if (defaultTexture != null)
-            defaultTexture.dispose();
+        if (actionSprites != null) {
+            for (Texture tex : actionSprites) {
+                tex.dispose();
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ public class CharacterSelectScreen implements Screen {
     private TextButton p1Char2Button;
 
     private TextButton p2Char1Button;
-    private TextButton p2Char2Button;
+    private TextButton p2Char2Button;he,llo
 
     // get ready for battle banner
     private Label battleBanner;
@@ -81,27 +81,27 @@ public class CharacterSelectScreen implements Screen {
         Table p1ButtonsTable = new Table();
 
         p1ButtonsTable.add(p1Char1Button)
-            .width(180)
-            .height(70)
-            .pad(10);
+                .width(180)
+                .height(70)
+                .pad(10);
 
         p1ButtonsTable.add(p1Char2Button)
-            .width(180)
-            .height(70)
-            .pad(10);
+                .width(180)
+                .height(70)
+                .pad(10);
 
         // player 2 button area - left side
         Table p2ButtonsTable = new Table();
 
         p2ButtonsTable.add(p2Char1Button)
-            .width(180)
-            .height(70)
-            .pad(10);
+                .width(180)
+                .height(70)
+                .pad(10);
 
         p2ButtonsTable.add(p2Char2Button)
-            .width(180)
-            .height(70)
-            .pad(10);
+                .width(180)
+                .height(70)
+                .pad(10);
 
         // battle banner
         battleBanner = new Label("GET READY FOR BATTLE", skin);
@@ -109,23 +109,22 @@ public class CharacterSelectScreen implements Screen {
         battleBanner.setVisible(false); // ‼️‼️‼️ @kevin set visible true in logic part upon pressing "enter"
 
         battleBanner.setPosition(
-            Gdx.graphics.getWidth() / 2f - 180,
-            Gdx.graphics.getHeight() / 2f
-        );
+                Gdx.graphics.getWidth() / 2f - 180,
+                Gdx.graphics.getHeight() / 2f);
 
         stage.addActor(battleBanner);
 
         // MAIN LAYOUT
         // TOP PREVIEW ROW
         rootTable.add(p1Preview)
-            .expandX()
-            .center()
-            .padTop(50);
+                .expandX()
+                .center()
+                .padTop(50);
 
         rootTable.add(p2Preview)
-            .expandX()
-            .center()
-            .padTop(50);
+                .expandX()
+                .center()
+                .padTop(50);
 
         rootTable.row();
 
@@ -137,16 +136,16 @@ public class CharacterSelectScreen implements Screen {
 
         // BOTTOM BUTTON ROW
         rootTable.add(p1ButtonsTable)
-            .expandX()
-            .left()
-            .padLeft(50)
-            .padBottom(50);
+                .expandX()
+                .left()
+                .padLeft(50)
+                .padBottom(50);
 
         rootTable.add(p2ButtonsTable)
-            .expandX()
-            .right()
-            .padRight(50)
-            .padBottom(50);
+                .expandX()
+                .right()
+                .padRight(50)
+                .padBottom(50);
 
         System.out.println("Character Select Screen");
     }
@@ -168,18 +167,22 @@ public class CharacterSelectScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        if (stage == null) return;
+        if (stage == null)
+            return;
         stage.getViewport().update(width, height, true);
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
-    public void hide() {}
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

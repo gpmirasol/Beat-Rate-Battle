@@ -43,7 +43,7 @@ public class GameScreen implements Screen {
         dBtn = new TextButton("D", skin);
 
         Table p1Table = new Table();
-        p1Table.add(wBtn).width(60).height(60).pad(5).colspan(3).row();
+        p1Table.add(wBtn).width(60).height(60).pad(5);
         p1Table.add(aBtn).width(60).height(60).pad(5);
         p1Table.add(sBtn).width(60).height(60).pad(5);
         p1Table.add(dBtn).width(60).height(60).pad(5);
@@ -55,7 +55,7 @@ public class GameScreen implements Screen {
         rightBtn = new TextButton(">", skin);
 
         Table p2Table = new Table();
-        p2Table.add(upBtn).width(60).height(60).pad(5).colspan(3).row();
+        p2Table.add(upBtn).width(60).height(60).pad(5);
         p2Table.add(leftBtn).width(60).height(60).pad(5);
         p2Table.add(downBtn).width(60).height(60).pad(5);
         p2Table.add(rightBtn).width(60).height(60).pad(5);

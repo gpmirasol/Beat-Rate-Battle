@@ -34,7 +34,7 @@ public class CharacterSelectScreen implements Screen {
     private TextButton p1Char2Button;
 
     private TextButton p2Char1Button;
-    private TextButton p2Char2Button;he,llo
+    private TextButton p2Char2Button;
 
     // get ready for battle banner
     private Label battleBanner;

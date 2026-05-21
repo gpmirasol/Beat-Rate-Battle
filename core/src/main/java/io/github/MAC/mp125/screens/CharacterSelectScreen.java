@@ -35,7 +35,8 @@ public class CharacterSelectScreen implements Screen {
     public static int selectedP1SpriteIndex = 0;
     public static int selectedP2SpriteIndex = 0;
 
-    // Sprite carousel fields | TODO: @grace Change colors to sprite assets | Update: Resolved
+    // Sprite carousel fields | TODO: @grace Change colors to sprite assets |
+    // Update: Resolved
     private Image p1Sprite, p2Sprite;
     private Texture[] characterSprites;
     private int p1SpriteIndex = 0;
@@ -68,9 +69,9 @@ public class CharacterSelectScreen implements Screen {
 
         // CHARACTER TEXTURES
         characterSprites = new Texture[] {
-            new Texture(Gdx.files.internal("meeracharsel.png")),
-            new Texture(Gdx.files.internal("kooacharsel.png")),
-            new Texture(Gdx.files.internal("aleiancharsel.png"))
+                new Texture(Gdx.files.internal("meeracharsel.png")),
+                new Texture(Gdx.files.internal("kooacharsel.png")),
+                new Texture(Gdx.files.internal("aleiancharsel.png"))
         };
 
         // CHARACTER IMAGES
@@ -92,35 +93,35 @@ public class CharacterSelectScreen implements Screen {
 
         // TOP LABELS
         rootTable.add(p1Label)
-            .expandX()
-            .left()
-            .padLeft(120)
-            .padTop(40);
+                .expandX()
+                .left()
+                .padLeft(120)
+                .padTop(40);
 
         rootTable.add(p2Label)
-            .expandX()
-            .right()
-            .padRight(120)
-            .padTop(40);
+                .expandX()
+                .right()
+                .padRight(120)
+                .padTop(40);
 
         rootTable.row();
 
         // BIG CHARACTER SPRITES
         rootTable.add(p1Sprite)
-            .width(500)
-            .height(500)
-            .expand()
-            .left()
-            .padLeft(50)
-            .padTop(20);
+                .width(500)
+                .height(500)
+                .expand()
+                .left()
+                .padLeft(50)
+                .padTop(20);
 
         rootTable.add(p2Sprite)
-            .width(500)
-            .height(500)
-            .expand()
-            .right()
-            .padRight(50)
-            .padTop(20);
+                .width(500)
+                .height(500)
+                .expand()
+                .right()
+                .padRight(50)
+                .padTop(20);
 
         rootTable.row();
 
@@ -132,22 +133,22 @@ public class CharacterSelectScreen implements Screen {
         p2Controls.setAlignment(Align.center);
 
         rootTable.add(p1Controls)
-            .left()
-            .padLeft(220)
-            .padBottom(20);
+                .left()
+                .padLeft(220)
+                .padBottom(20);
 
         rootTable.add(p2Controls)
-            .right()
-            .padRight(180)
-            .padBottom(20);
+                .right()
+                .padRight(180)
+                .padBottom(20);
 
         rootTable.row();
 
         // ENTER LABEL
         rootTable.add(battleBanner)
-            .colspan(2)
-            .center()
-            .padBottom(40);
+                .colspan(2)
+                .center()
+                .padBottom(40);
 
         System.out.println("Character Select Screen");
     }

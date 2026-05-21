@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -46,12 +48,11 @@ public class SongSelectScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin  = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         // initial song preview background (default state)
         songPreviewBackground = new Image(
-            new Texture(Gdx.files.internal("bg.png"))
-        );
+                new Texture(Gdx.files.internal("bg.png")));
 
         songPreviewBackground.setFillParent(true);
         stage.addActor(songPreviewBackground);
@@ -65,6 +66,17 @@ public class SongSelectScreen implements Screen {
         song1Button = new TextButton("SONG 1", skin);
         song2Button = new TextButton("SONG 2", skin);
         song3Button = new TextButton("SONG 3", skin);
+
+        ChangeListener playListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new GameScreen(game));
+            }
+        };
+
+        song1Button.addListener(playListener);
+        song2Button.addListener(playListener);
+        song3Button.addListener(playListener);
 
         Table songBar = new Table();
 
@@ -86,8 +98,7 @@ public class SongSelectScreen implements Screen {
         startBanner = new Label("PRESS ENTER TO PLAY", skin);
 
         startBanner.setPosition(
-            Gdx.graphics.getWidth() / 2f - 150, 60
-        );
+                Gdx.graphics.getWidth() / 2f - 150, 60);
 
         startBanner.setVisible(true);
         stage.addActor(startBanner);
@@ -110,7 +121,8 @@ public class SongSelectScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        if  (stage == null) return;
+        if (stage == null)
+            return;
         stage.getViewport().update(width, height, true);
     }
 
@@ -134,5 +146,6 @@ public class SongSelectScreen implements Screen {
 }
 
 // todo: kevin can implement songPreviewBackground.setDrawable(...) safely
-// todo: or later upgrade to fade transitions, shader effects without touching UI layout :DD yay
+// todo: or later upgrade to fade transitions, shader effects without touching
+// UI layout :DD yay
 // todo: smooth fade between images (optional)

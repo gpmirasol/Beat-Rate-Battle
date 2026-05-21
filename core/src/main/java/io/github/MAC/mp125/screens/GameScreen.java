@@ -17,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.Animation;
+
 public class GameScreen implements Screen {
     private Game game;
     private Stage stage;
@@ -26,7 +28,16 @@ public class GameScreen implements Screen {
     private ProgressBar progressBar;
     private float health = 50f;
 
-    private Texture[] actionSprites;
+    // Animation fields
+    private static final int FRAME_COLS = 3, FRAME_ROWS = 3; // Adjust based on actual sprite sheet
+    private Animation<TextureRegion> p1AnimW, p1AnimA, p1AnimS, p1AnimD;
+    private Animation<TextureRegion> p2AnimUp, p2AnimLeft, p2AnimDown, p2AnimRight;
+    private Animation<TextureRegion> p1CurrentAnim, p2CurrentAnim;
+    private Texture p1SpriteSheet;
+    private Texture p2SpriteSheet;
+    private float p1StateTime = 0f;
+    private float p2StateTime = 0f;
+    private TextureRegion p1IdleFrame, p2IdleFrame;
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
@@ -92,14 +103,45 @@ public class GameScreen implements Screen {
 
         // Placeholders for player sprites | TODO: @grace Change Image/s for Sprites
         rootTable.row();
-        actionSprites = new Texture[] {
-            new Texture(Gdx.files.internal("default.png")),
-            new Texture(Gdx.files.internal("howtoplay1.png")),
-            new Texture(Gdx.files.internal("howtoplay2.png")),
-            new Texture(Gdx.files.internal("howtoplay3.png"))
-        };
-        p1Sprite = new Image(actionSprites[0]);
-        p2Sprite = new Image(actionSprites[0]);
+        // Load Sprite Sheets
+        p1SpriteSheet = new Texture(Gdx.files.internal("aleiancharsel.png"));
+        TextureRegion[][] p1Tmp = TextureRegion.split(p1SpriteSheet,
+                p1SpriteSheet.getWidth() / FRAME_COLS,
+                p1SpriteSheet.getHeight() / FRAME_ROWS);
+        TextureRegion[] p1Frames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        int index = 0;
+        for (int i = 0; i < FRAME_ROWS; i++) {
+            for (int j = 0; j < FRAME_COLS; j++) {
+                p1Frames[index++] = p1Tmp[i][j];
+            }
+        }
+        p1AnimW = new Animation<>(0.15f, p1Frames[4], p1Frames[5]);
+        p1AnimA = new Animation<>(0.15f, p1Frames[1], p1Frames[2]);
+        p1AnimS = new Animation<>(0.15f, p1Frames[2], p1Frames[3]);
+        p1AnimD = new Animation<>(0.15f, p1Frames[3], p1Frames[4]);
+        p1CurrentAnim = p1AnimW;
+        p1IdleFrame = p1Frames[0];
+
+        p2SpriteSheet = new Texture(Gdx.files.internal("kooacharsel.png"));
+        TextureRegion[][] p2Tmp = TextureRegion.split(p2SpriteSheet,
+                p2SpriteSheet.getWidth() / FRAME_COLS,
+                p2SpriteSheet.getHeight() / FRAME_ROWS);
+        TextureRegion[] p2Frames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        index = 0;
+        for (int i = 0; i < FRAME_ROWS; i++) {
+            for (int j = 0; j < FRAME_COLS; j++) {
+                p2Frames[index++] = p2Tmp[i][j];
+            }
+        }
+        p2AnimUp = new Animation<>(0.15f, p2Frames[4], p2Frames[5]);
+        p2AnimLeft = new Animation<>(0.15f, p2Frames[1], p2Frames[2]);
+        p2AnimDown = new Animation<>(0.15f, p2Frames[2], p2Frames[3]);
+        p2AnimRight = new Animation<>(0.15f, p2Frames[3], p2Frames[4]);
+        p2CurrentAnim = p2AnimUp;
+        p2IdleFrame = p2Frames[0];
+
+        p1Sprite = new Image(p1IdleFrame);
+        p2Sprite = new Image(p2IdleFrame);
 
         rootTable.add(p1Sprite).width(150).height(150).expand().center();
         rootTable.add().expand().center(); // spacer for the middle column
@@ -180,28 +222,52 @@ public class GameScreen implements Screen {
             health = 0f;
         healthBar.setValue(health);
 
-        //TODO: @grace Update Placeholder Sprite with Images
-        if (Gdx.input.isKeyPressed(Input.Keys.W))
-            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
-        else if (Gdx.input.isKeyPressed(Input.Keys.A))
-            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[2])));
-        else if (Gdx.input.isKeyPressed(Input.Keys.S))
-            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[3])));
-        else if (Gdx.input.isKeyPressed(Input.Keys.D))
-            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
-        else
-            p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[0])));
+        // Apply animation frame corresponding to key
+        boolean p1Moving = false;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            p1CurrentAnim = p1AnimW;
+            p1Moving = true;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            p1CurrentAnim = p1AnimA;
+            p1Moving = true;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            p1CurrentAnim = p1AnimS;
+            p1Moving = true;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            p1CurrentAnim = p1AnimD;
+            p1Moving = true;
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
-        else if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[2])));
-        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[3])));
-        else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[1])));
-        else
-            p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(actionSprites[0])));
+        if (p1Moving) {
+            p1StateTime += delta;
+            p1Sprite.setDrawable(new TextureRegionDrawable(p1CurrentAnim.getKeyFrame(p1StateTime, true)));
+        } else {
+            p1StateTime = 0f;
+            p1Sprite.setDrawable(new TextureRegionDrawable(p1IdleFrame));
+        }
+
+        boolean p2Moving = false;
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            p2CurrentAnim = p2AnimUp;
+            p2Moving = true;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            p2CurrentAnim = p2AnimLeft;
+            p2Moving = true;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            p2CurrentAnim = p2AnimDown;
+            p2Moving = true;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            p2CurrentAnim = p2AnimRight;
+            p2Moving = true;
+        }
+
+        if (p2Moving) {
+            p2StateTime += delta;
+            p2Sprite.setDrawable(new TextureRegionDrawable(p2CurrentAnim.getKeyFrame(p2StateTime, true)));
+        } else {
+            p2StateTime = 0f;
+            p2Sprite.setDrawable(new TextureRegionDrawable(p2IdleFrame));
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new ResultsScreen(game));
@@ -232,16 +298,21 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        if (stage != null)
+        if (stage != null) {
             stage.dispose();
-        if (skin != null)
-            skin.dispose();
-        if (bgTexture != null)
-            bgTexture.dispose();
-        if (actionSprites != null) {
-            for (Texture tex : actionSprites) {
-                tex.dispose();
-            }
         }
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (bgTexture != null) {
+            bgTexture.dispose();
+        }
+        if (p1SpriteSheet != null) {
+            p1SpriteSheet.dispose();
+        }
+        if (p2SpriteSheet != null) {
+            p2SpriteSheet.dispose();
+        }
+
     }
 }

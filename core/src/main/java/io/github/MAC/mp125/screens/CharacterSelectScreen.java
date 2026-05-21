@@ -14,6 +14,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Input;
 
 import com.badlogic.gdx.utils.Align;
@@ -28,6 +30,17 @@ public class CharacterSelectScreen implements Screen {
 
     private Table rootTable;
 
+    // preview placeholders
+    private Label p1Preview;
+    private Label p2Preview;
+
+    // character buttons
+    private TextButton p1Char1Button;
+    private TextButton p1Char2Button;
+
+    private TextButton p2Char1Button;
+    private TextButton p2Char2Button;
+
     // get ready for battle banner
     private Label battleBanner;
 
@@ -35,7 +48,7 @@ public class CharacterSelectScreen implements Screen {
     public static int selectedP1SpriteIndex = 0;
     public static int selectedP2SpriteIndex = 0;
 
-    // Sprite carousel fields | TODO: @grace Change colors to sprite assets | Update: Resolved
+    // Sprite carousel fields | TODO: @grace Change images to sprite assets
     private Image p1Sprite, p2Sprite;
     private Texture[] characterSprites;
     private int p1SpriteIndex = 0;
@@ -53,101 +66,110 @@ public class CharacterSelectScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        // BACKGROUND
         Texture bgTexture = new Texture(Gdx.files.internal("CharacterSelectScreenBg.png"));
         background = new Image(bgTexture);
         background.setFillParent(true);
 
         stage.addActor(background);
 
-        // MAIN TABLE
         rootTable = new Table();
         rootTable.setFillParent(true);
 
         stage.addActor(rootTable);
 
-        // CHARACTER TEXTURES
+        // top preview area
+        p1Preview = new Label("P1 PREVIEW", skin);
+        p2Preview = new Label("P2 PREVIEW", skin);
+
+        p1Preview.setAlignment(Align.center);
+        p2Preview.setAlignment(Align.center);
+
+        // character buttons - player 1
+        p1Char1Button = new TextButton("P1 Char 1", skin);
+        p1Char2Button = new TextButton("P1 Char 2", skin);
+
+        // character buttons - player 2
+        p2Char1Button = new TextButton("P2 Char 1", skin);
+        p2Char2Button = new TextButton("P2 Char 2", skin);
+
+        // player 1 button area - left side
+        Table p1ButtonsTable = new Table();
+
+        p1ButtonsTable.add(p1Char1Button)
+                .width(180)
+                .height(70)
+                .pad(10);
+
+        p1ButtonsTable.add(p1Char2Button)
+                .width(180)
+                .height(70)
+                .pad(10);
+
+        // player 2 button area - left side
+        Table p2ButtonsTable = new Table();
+
+        p2ButtonsTable.add(p2Char1Button)
+                .width(180)
+                .height(70)
+                .pad(10);
+
+        p2ButtonsTable.add(p2Char2Button)
+                .width(180)
+                .height(70)
+                .pad(10);
+
+        // battle banner
+        battleBanner = new Label("GET READY FOR BATTLE", skin);
+        battleBanner.setAlignment(Align.center);
+        battleBanner.setVisible(false);
+
+        battleBanner.setPosition(
+                Gdx.graphics.getWidth() / 2f - 180,
+                Gdx.graphics.getHeight() / 2f);
+
+        stage.addActor(battleBanner);
+
+        // MAIN LAYOUT
+        // TOP PREVIEW ROW
+        rootTable.add(p1Preview)
+                .expandX()
+                .center()
+                .padTop(50);
+
+        rootTable.add(p2Preview)
+                .expandX()
+                .center()
+                .padTop(50);
+
+        rootTable.row();
+
+        // SPRITE PREVIEWS (Instead of empty space)
         characterSprites = new Texture[] {
-            new Texture(Gdx.files.internal("meeracharsel.png")),
-            new Texture(Gdx.files.internal("kooacharsel.png")),
-            new Texture(Gdx.files.internal("aleiancharsel.png"))
+                new Texture(Gdx.files.internal("default.png")),
+                new Texture(Gdx.files.internal("howtoplay1.png")),
+                new Texture(Gdx.files.internal("howtoplay2.png"))
         };
 
-        // CHARACTER IMAGES
         p1Sprite = new Image(characterSprites[0]);
         p2Sprite = new Image(characterSprites[0]);
 
-        // PLAYER LABELS
-        Label p1Label = new Label("PLAYER 1", skin);
-        Label p2Label = new Label("PLAYER 2", skin);
-
-        p1Label.setAlignment(Align.center);
-        p2Label.setAlignment(Align.center);
-
-        // READY LABEL
-        battleBanner = new Label("PRESS ENTER TO CONTINUE", skin);
-        battleBanner.setAlignment(Align.center);
-
-        // LAYOUT
-
-        // TOP LABELS
-        rootTable.add(p1Label)
-            .expandX()
-            .left()
-            .padLeft(120)
-            .padTop(40);
-
-        rootTable.add(p2Label)
-            .expandX()
-            .right()
-            .padRight(120)
-            .padTop(40);
+        rootTable.add(p1Sprite).width(200).height(200).expandX().center();
+        rootTable.add(p2Sprite).width(200).height(200).expandX().center();
 
         rootTable.row();
 
-        // BIG CHARACTER SPRITES
-        rootTable.add(p1Sprite)
-            .width(500)
-            .height(500)
-            .expand()
-            .left()
-            .padLeft(50)
-            .padTop(20);
+        // BOTTOM BUTTON ROW
+        rootTable.add(p1ButtonsTable)
+                .expandX()
+                .left()
+                .padLeft(50)
+                .padBottom(50);
 
-        rootTable.add(p2Sprite)
-            .width(500)
-            .height(500)
-            .expand()
-            .right()
-            .padRight(50)
-            .padTop(20);
-
-        rootTable.row();
-
-        // CONTROLS TEXT
-        Label p1Controls = new Label("A / D", skin);
-        Label p2Controls = new Label("LEFT / RIGHT", skin);
-
-        p1Controls.setAlignment(Align.center);
-        p2Controls.setAlignment(Align.center);
-
-        rootTable.add(p1Controls)
-            .left()
-            .padLeft(220)
-            .padBottom(20);
-
-        rootTable.add(p2Controls)
-            .right()
-            .padRight(180)
-            .padBottom(20);
-
-        rootTable.row();
-
-        // ENTER LABEL
-        rootTable.add(battleBanner)
-            .colspan(2)
-            .center()
-            .padBottom(40);
+        rootTable.add(p2ButtonsTable)
+                .expandX()
+                .right()
+                .padRight(50)
+                .padBottom(50);
 
         System.out.println("Character Select Screen");
     }

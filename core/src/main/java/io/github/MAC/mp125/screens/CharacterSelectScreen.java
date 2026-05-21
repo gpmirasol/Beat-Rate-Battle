@@ -12,6 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input;
 
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -38,6 +41,16 @@ public class CharacterSelectScreen implements Screen {
 
     // get ready for battle banner
     private Label battleBanner;
+
+    // remember sprite selected
+    public static int selectedP1SpriteIndex = 0;
+    public static int selectedP2SpriteIndex = 0;
+
+    // Sprite carousel fields | TODO: @grace Change colors to sprite assets
+    private Image p1Sprite, p2Sprite;
+    private Color[] colors = { Color.RED, Color.GREEN, Color.BLUE };
+    private int p1SpriteIndex = 0;
+    private int p2SpriteIndex = 0;
 
     public CharacterSelectScreen(Game game) {
         this.game = game;
@@ -106,7 +119,7 @@ public class CharacterSelectScreen implements Screen {
         // battle banner
         battleBanner = new Label("GET READY FOR BATTLE", skin);
         battleBanner.setAlignment(Align.center);
-        battleBanner.setVisible(false); // ‼️‼️‼️ @kevin set visible true in logic part upon pressing "enter"
+        battleBanner.setVisible(false);
 
         battleBanner.setPosition(
                 Gdx.graphics.getWidth() / 2f - 180,
@@ -128,9 +141,18 @@ public class CharacterSelectScreen implements Screen {
 
         rootTable.row();
 
-        // EMPTY SPACE
-        rootTable.add().height(300);
-        rootTable.add();
+        // SPRITE PREVIEWS (Instead of empty space)
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        Texture whiteTexture = new Texture(pixmap);
+        pixmap.dispose();
+
+        p1Sprite = new Image(whiteTexture);
+        p2Sprite = new Image(whiteTexture);
+
+        rootTable.add(p1Sprite).width(200).height(200).expandX().center();
+        rootTable.add(p2Sprite).width(200).height(200).expandX().center();
 
         rootTable.row();
 
@@ -156,7 +178,37 @@ public class CharacterSelectScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ENTER)) {
+        // P1 Color Carousel
+        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            p1SpriteIndex--;
+            if (p1SpriteIndex < 0)
+                p1SpriteIndex = colors.length - 1;
+            p1Sprite.setColor(colors[p1SpriteIndex]);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            p1SpriteIndex++;
+            if (p1SpriteIndex >= colors.length)
+                p1SpriteIndex = 0;
+            p1Sprite.setColor(colors[p1SpriteIndex]);
+        }
+
+        // P2 Color Carousel
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            p2SpriteIndex--;
+            if (p2SpriteIndex < 0)
+                p2SpriteIndex = colors.length - 1;
+            p2Sprite.setColor(colors[p2SpriteIndex]);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            p2SpriteIndex++;
+            if (p2SpriteIndex >= colors.length)
+                p2SpriteIndex = 0;
+            p2Sprite.setColor(colors[p2SpriteIndex]);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            selectedP1SpriteIndex = p1SpriteIndex;
+            selectedP2SpriteIndex = p2SpriteIndex;
             battleBanner.setVisible(true);
             game.setScreen(new SongSelectScreen(game));
         }

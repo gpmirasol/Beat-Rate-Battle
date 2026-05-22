@@ -59,7 +59,8 @@ public class GameScreen implements Screen {
     private Texture p2SpriteSheet;
     private float p1StateTime = 0f;
     private float p2StateTime = 0f;
-    private TextureRegion p1IdleFrame, p2IdleFrame;
+    private Animation<TextureRegion> p1AnimIdle;
+    private TextureRegion p2IdleFrame;
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
@@ -139,13 +140,13 @@ public class GameScreen implements Screen {
 
         // Todo: Assign animations based on rows (each row = 3 frames)
         // Todo: Row 0: IDLE, Row 1: Up(W), Row 2: Left(A), Row 3: Down(S), Row 4: Right(D), Row 5: Miss
-        p1IdleFrame = p1Tmp[0][0];
+        p1AnimIdle = new Animation<>(0.10f, p1Tmp[0]);
         p1AnimW = new Animation<>(0.10f, p1Tmp[1]);
         p1AnimA = new Animation<>(0.10f, p1Tmp[2]);
         p1AnimS = new Animation<>(0.10f, p1Tmp[3]);
         p1AnimD = new Animation<>(0.10f, p1Tmp[4]);
-        p1CurrentAnim = p1AnimW;
-        
+        p1CurrentAnim = p1AnimIdle;
+
 
         p2SpriteSheet = new Texture(Gdx.files.internal("kooacharsel.png"));
         TextureRegion[][] p2Tmp = TextureRegion.split(p2SpriteSheet,
@@ -165,8 +166,7 @@ public class GameScreen implements Screen {
         p2CurrentAnim = p2AnimUp;
         p2IdleFrame = p2Frames[0];
 
-        p1Sprite = new Image(p1IdleFrame);
-        rootTable.add(p1Sprite).width(400).height(400).expand().center();
+        p1Sprite = new Image(p1AnimIdle.getKeyFrame(0));
 
         p2Sprite = new Image(p2IdleFrame);
 
@@ -366,13 +366,14 @@ public class GameScreen implements Screen {
             p1Moving = true;
         }
 
-        if (p1Moving) {
-            p1StateTime += delta;
-            p1Sprite.setDrawable(new TextureRegionDrawable(p1CurrentAnim.getKeyFrame(p1StateTime, true)));
-        } else {
-            p1StateTime = 0f;
-            p1Sprite.setDrawable(new TextureRegionDrawable(p1IdleFrame));
+        if (!p1Moving) {
+            if (p1CurrentAnim != p1AnimIdle) {
+                p1CurrentAnim = p1AnimIdle;
+                p1StateTime = 0f; // Reset only once when switching to idle
+            }
         }
+        p1StateTime += delta;
+        p1Sprite.setDrawable(new TextureRegionDrawable(p1CurrentAnim.getKeyFrame(p1StateTime, true)));
 
         boolean p2Moving = false;
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {

@@ -11,8 +11,9 @@ public class PlayerStats {
     public int score = 0;
 
     public void recordHit(io.github.MAC.mp125.notes.HitDetector.HitGrade grade) {
-        if (grade == io.github.MAC.mp125.notes.HitDetector.HitGrade.NONE) return;
-        
+        if (grade == io.github.MAC.mp125.notes.HitDetector.HitGrade.NONE)
+            return;
+
         totalNotes++;
         if (grade != io.github.MAC.mp125.notes.HitDetector.HitGrade.MISS) {
             currentCombo++;
@@ -21,18 +22,28 @@ public class PlayerStats {
             }
         } else {
             currentCombo = 0;
+        }
+
+        if (grade == io.github.MAC.mp125.notes.HitDetector.HitGrade.MISS) {
             misses++;
             return;
         }
 
-        switch(grade) {
-            case PERFECT: perfects++; break;
-            case GOOD: goods++; break;
-            case MEH: mehs++; break;
-            default: break;
+        switch (grade) {
+            case PERFECT:
+                perfects++;
+                break;
+            case GOOD:
+                goods++;
+                break;
+            case MEH:
+                mehs++;
+                break;
+            default:
+                break;
         }
     }
-    
+
     public void recordMiss() {
         totalNotes++;
         currentCombo = 0;

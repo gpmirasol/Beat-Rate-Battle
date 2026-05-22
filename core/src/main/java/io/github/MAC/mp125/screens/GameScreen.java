@@ -310,6 +310,7 @@ public class GameScreen implements Screen {
 
     private void processHitAttempt(ConcurrentLinkedQueue<GameNote> notes, int laneIndex, boolean isP1) {
         Iterator<GameNote> iterator = notes.iterator();
+        boolean hitRegistered = false;
         while (iterator.hasNext()) {
             GameNote note = iterator.next();
             if (note.laneIndex == laneIndex) {
@@ -429,8 +430,33 @@ public class GameScreen implements Screen {
                         p2HitGradeImage.setVisible(true);
                         p2LabelTimer = 1.0f;
                     }
+                    hitRegistered = true;
                     return;
                 }
+            }
+        }
+        
+        if (!hitRegistered) {
+            if (isP1) {
+                p1Stats.recordMiss();
+                health -= 2f;
+                p1MissTimer = 0.3f;
+                p1CurrentIndAnim = indAnimMiss;
+                p1IndStateTime = 0f;
+                p1HitGradeImage.setVisible(true);
+                p1LabelTimer = 1.0f;
+                p1PerfectStreak = 0;
+                p1StreakImage.setVisible(false);
+            } else {
+                p2Stats.recordMiss();
+                health += 2f;
+                p2MissTimer = 0.3f;
+                p2CurrentIndAnim = indAnimMiss;
+                p2IndStateTime = 0f;
+                p2HitGradeImage.setVisible(true);
+                p2LabelTimer = 1.0f;
+                p2PerfectStreak = 0;
+                p2StreakImage.setVisible(false);
             }
         }
     }

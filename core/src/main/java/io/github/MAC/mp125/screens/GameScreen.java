@@ -340,6 +340,7 @@ public class GameScreen implements Screen {
                     }
                     if (isP1) {
                         p1Stats.recordHit(grade);
+                        if (p2HardModeTimer > 0) points *= 2;
                         p1Score += points;
                         p1Stats.score = p1Score;
                         health += hpChange;
@@ -384,6 +385,7 @@ public class GameScreen implements Screen {
                         p1LabelTimer = 1.0f;
                     } else {
                         p2Stats.recordHit(grade);
+                        if (p1HardModeTimer > 0) points *= 2;
                         p2Score += points;
                         p2Stats.score = p2Score;
                         health -= hpChange;
@@ -546,10 +548,12 @@ public class GameScreen implements Screen {
                 } else if (currentSongTimeMs >= note.endTimeMs) {
                     iterator.remove();
                     if (isP1) {
-                        p1Score += 10;
+                        int holdPoints = (p2HardModeTimer > 0) ? 20 : 10;
+                        p1Score += holdPoints;
                         health += 1f;
                     } else {
-                        p2Score += 10;
+                        int holdPoints = (p1HardModeTimer > 0) ? 20 : 10;
+                        p2Score += holdPoints;
                         health -= 1f;
                     }
                     continue;

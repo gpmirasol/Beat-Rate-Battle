@@ -85,6 +85,7 @@ public class GameScreen implements Screen {
     private float p2HardModeTimer = 0f;
     private io.github.MAC.mp125.PlayerStats p1Stats = new io.github.MAC.mp125.PlayerStats();
     private io.github.MAC.mp125.PlayerStats p2Stats = new io.github.MAC.mp125.PlayerStats();
+    private long totalSongDurationMs = 0;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -170,8 +171,9 @@ public class GameScreen implements Screen {
         // Add to root table
         rootTable.add(p1Table).expand().left().pad(50).top();
 
-        healthBar = new ProgressBar(0, 100, 1, false, skin);
+        healthBar = new ProgressBar(0f, 100f, 0.01f, false, skin);
         healthBar.setValue(health);
+        healthBar.setAnimateDuration(0.1f);
 
         Table middleTable = new Table();
         middleTable.add(healthBar).colspan(2).center().top().padTop(70).width(300);
@@ -277,8 +279,9 @@ public class GameScreen implements Screen {
         rootTable.add(p2ScoreLabel).expand().center().top();
 
         rootTable.row();
-        progressBar = new ProgressBar(0, 100, 1, false, skin);
+        progressBar = new ProgressBar(0f, 100f, 0.01f, false, skin);
         progressBar.setValue(50f);
+        progressBar.setAnimateDuration(0.1f);
         rootTable.add(progressBar).colspan(3).expand().fillX().bottom().pad(50);
 
         // Init Notes and Renderer
@@ -292,6 +295,14 @@ public class GameScreen implements Screen {
 
         p1Notes = smParser.parseChart(songName + "_easy.sm", 1);
         p2Notes = smParser.parseChart(songName + "_easy.sm", 2);
+
+        for (GameNote note : p1Notes) {
+            long end = note.isHoldNote ? note.endTimeMs : note.targetTimeMs;
+            if (end > totalSongDurationMs) {
+                totalSongDurationMs = end;
+            }
+        }
+        totalSongDurationMs += 2000; // Pad end by 2 seconds
 
         System.out.println("Game Screen Started");
     }
@@ -341,7 +352,8 @@ public class GameScreen implements Screen {
                     }
                     if (isP1) {
                         p1Stats.recordHit(grade);
-                        if (p2HardModeTimer > 0) points *= 2;
+                        if (p2HardModeTimer > 0)
+                            points *= 2;
                         p1Score += points;
                         p1Stats.score = p1Score;
                         health += hpChange;
@@ -386,7 +398,8 @@ public class GameScreen implements Screen {
                         p1LabelTimer = 1.0f;
                     } else {
                         p2Stats.recordHit(grade);
-                        if (p1HardModeTimer > 0) points *= 2;
+                        if (p1HardModeTimer > 0)
+                            points *= 2;
                         p2Score += points;
                         p2Stats.score = p2Score;
                         health -= hpChange;
@@ -435,7 +448,7 @@ public class GameScreen implements Screen {
                 }
             }
         }
-        
+
         if (!hitRegistered) {
             if (isP1) {
                 p1Stats.recordMiss();
@@ -679,6 +692,13 @@ public class GameScreen implements Screen {
         if (health <= 0)
             health = 0f;
         healthBar.setValue(health);
+
+        if (totalSongDurationMs > 0) {
+            float progress = ((float) currentSongTimeMs / totalSongDurationMs) * 100f;
+            if (progress > 100f)
+                progress = 100f;
+            progressBar.setValue(progress);
+        }
 
         // Apply animation frame corresponding to key
         boolean p1Moving = false;

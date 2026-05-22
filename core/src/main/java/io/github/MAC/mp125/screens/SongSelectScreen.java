@@ -31,6 +31,8 @@ public class SongSelectScreen implements Screen {
     // song base names matching assets
     private String[] songNames = { "Apple", "Beauty and a Beat", "Gentleman" };
 
+    private String[] bgNames = { "apple", "beauty", "gentleman" };
+
     private Table rootTable;
 
     // full screen dynamic background (preview system)
@@ -152,7 +154,7 @@ public class SongSelectScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            game.setScreen(new GameScreen(game, songNames[selectedSongIndex]));
+            game.setScreen(new GameScreen(game, songNames[selectedSongIndex],bgNames[selectedSongIndex]));
         }
 
         stage.act(delta);

@@ -49,6 +49,7 @@ public class GameScreen implements Screen {
 
     private Music backgroundMusic;
     private String songName;
+    private String bgName;
 
     // Animation fields
     private static final int FRAME_COLS = 3, FRAME_ROWS = 6; // Todo: Adjust based on sprite sheet Update: Done
@@ -66,10 +67,6 @@ public class GameScreen implements Screen {
     private float p2LabelTimer = 0f;
     private Image p1HitGradeImage, p2HitGradeImage;
     private Animation<TextureRegion> indAnimPerfect, indAnimAmazing, indAnimGood, indAnimMeh, indAnimBad, indAnimMiss;
-    private Animation<TextureRegion> p1IndAnimPerfect, p1IndAnimAmazing, p1IndAnimGood, p1IndAnimMeh, p1IndAnimBad,
-            p1IndAnimMiss;
-    private Animation<TextureRegion> p2IndAnimPerfect, p2IndAnimAmazing, p2IndAnimGood, p2IndAnimMeh, p2IndAnimBad,
-            p2IndAnimMiss;
     private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
     private float p1IndStateTime = 0f, p2IndStateTime = 0f;
     private Animation<TextureRegion> p1AnimIdle;
@@ -77,8 +74,13 @@ public class GameScreen implements Screen {
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
+    private Image p1StreakImage, p2StreakImage;
+    private Texture indicatorSpriteSheet;
+    private TextureRegion[] counterFrames;
     private int p1Score = 0;
     private int p2Score = 0;
+    private int p1PerfectStreak = 0;
+    private int p2PerfectStreak = 0;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -92,9 +94,10 @@ public class GameScreen implements Screen {
     private TextureRegionDrawable drawPressedLeft, drawPressedDown, drawPressedUp, drawPressedRight;
     private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
 
-    public GameScreen(Game game, String songName) {
+    public GameScreen(Game game, String songName, String bgName) {
         this.game = game;
         this.songName = songName;
+        this.bgName = bgName;
     }
 
     @Override
@@ -102,7 +105,8 @@ public class GameScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        bgTexture = new Texture(Gdx.files.internal("GameScreenBGPlaceholder.png"));
+
+        bgTexture = new Texture(Gdx.files.internal(bgName + "background.png"));
         Image bgImage = new Image(bgTexture);
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
@@ -174,6 +178,14 @@ public class GameScreen implements Screen {
         p2HitGradeImage = new Image();
         middleTable.add(p1HitGradeImage).padRight(20).padTop(20).width(100).height(100);
         middleTable.add(p2HitGradeImage).padLeft(20).padTop(20).width(100).height(100);
+
+        middleTable.row();
+        p1StreakImage = new Image();
+        p2StreakImage = new Image();
+        p1StreakImage.setVisible(false);
+        p2StreakImage.setVisible(false);
+        middleTable.add(p1StreakImage).padRight(20).padTop(10).width(80).height(40);
+        middleTable.add(p2StreakImage).padLeft(20).padTop(10).width(80).height(40);
 
         rootTable.add(middleTable).expand().center().top();
 
@@ -437,17 +449,21 @@ public class GameScreen implements Screen {
                 if (isP1) {
                     health -= 2f;
                     p1MissTimer = 0.3f;
-                    p1CurrentIndAnim = p1IndAnimMiss;
+                    p1CurrentIndAnim = indAnimMiss;
                     p1IndStateTime = 0f;
                     p1HitGradeImage.setVisible(true);
                     p1LabelTimer = 1.0f;
+                    p1PerfectStreak = 0;
+                    p1StreakImage.setVisible(false);
                 } else {
                     health += 2f;
                     p2MissTimer = 0.3f;
-                    p2CurrentIndAnim = p2IndAnimMiss;
+                    p2CurrentIndAnim = indAnimMiss;
                     p2IndStateTime = 0f;
                     p2HitGradeImage.setVisible(true);
                     p2LabelTimer = 1.0f;
+                    p2PerfectStreak = 0;
+                    p2StreakImage.setVisible(false);
                 }
                 continue;
             }

@@ -35,11 +35,15 @@ public class smParser {
                     continue;
 
                 if (line.startsWith("#BPMS:")) {
-                    String content = line.substring(6, line.indexOf(";"));
-                    String[] parts = content.split("=");
-                    bpm = Double.parseDouble(parts[1]);
+                    int semiIndex = line.indexOf(";");
+                    String content = (semiIndex != -1) ? line.substring(6, semiIndex) : line.substring(6);
+                    if (content.contains("=")) {
+                        String[] parts = content.split("=");
+                        bpm = Double.parseDouble(parts[1]);
+                    }
                 } else if (line.startsWith("#OFFSET:")) {
-                    String content = line.substring(8, line.indexOf(";"));
+                    int semiIndex = line.indexOf(";");
+                    String content = (semiIndex != -1) ? line.substring(8, semiIndex) : line.substring(8);
                     offsetSeconds = Double.parseDouble(content);
                 } else if (line.startsWith("#NOTES:")) {
                     insideNotesSection = true;

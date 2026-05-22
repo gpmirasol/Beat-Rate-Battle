@@ -50,7 +50,8 @@ public class GameScreen implements Screen {
     private String songName;
 
     // Animation fields
-    private static final int FRAME_COLS = 3, FRAME_ROWS = 3; // Adjust based on actual sprite sheet
+    private static final int FRAME_COLS = 3, FRAME_ROWS = 6; // Todo: Adjust based on sprite sheet Update: Done
+    private static final int SPRITE_SIZE = 682;
     private Animation<TextureRegion> p1AnimW, p1AnimA, p1AnimS, p1AnimD;
     private Animation<TextureRegion> p2AnimUp, p2AnimLeft, p2AnimDown, p2AnimRight;
     private Animation<TextureRegion> p1CurrentAnim, p2CurrentAnim;
@@ -126,10 +127,8 @@ public class GameScreen implements Screen {
         // Placeholders for player sprites | TODO: @grace Change Image/s for Sprites
         rootTable.row();
         // Load Sprite Sheets
-        p1SpriteSheet = new Texture(Gdx.files.internal("aleiancharsel.png"));
-        TextureRegion[][] p1Tmp = TextureRegion.split(p1SpriteSheet,
-                p1SpriteSheet.getWidth() / FRAME_COLS,
-                p1SpriteSheet.getHeight() / FRAME_ROWS);
+        p1SpriteSheet = new Texture(Gdx.files.internal("meeraspritesheet.png"));
+        TextureRegion[][] p1Tmp = TextureRegion.split(p1SpriteSheet, SPRITE_SIZE, SPRITE_SIZE);
         TextureRegion[] p1Frames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
         for (int i = 0; i < FRAME_ROWS; i++) {
@@ -137,12 +136,16 @@ public class GameScreen implements Screen {
                 p1Frames[index++] = p1Tmp[i][j];
             }
         }
-        p1AnimW = new Animation<>(0.15f, p1Frames[4], p1Frames[5]);
-        p1AnimA = new Animation<>(0.15f, p1Frames[1], p1Frames[2]);
-        p1AnimS = new Animation<>(0.15f, p1Frames[2], p1Frames[3]);
-        p1AnimD = new Animation<>(0.15f, p1Frames[3], p1Frames[4]);
+
+        // Todo: Assign animations based on rows (each row = 3 frames)
+        // Todo: Row 0: IDLE, Row 1: Up(W), Row 2: Left(A), Row 3: Down(S), Row 4: Right(D), Row 5: Miss
+        p1IdleFrame = p1Tmp[0][0];
+        p1AnimW = new Animation<>(0.10f, p1Tmp[1]);
+        p1AnimA = new Animation<>(0.10f, p1Tmp[2]);
+        p1AnimS = new Animation<>(0.10f, p1Tmp[3]);
+        p1AnimD = new Animation<>(0.10f, p1Tmp[4]);
         p1CurrentAnim = p1AnimW;
-        p1IdleFrame = p1Frames[0];
+        
 
         p2SpriteSheet = new Texture(Gdx.files.internal("kooacharsel.png"));
         TextureRegion[][] p2Tmp = TextureRegion.split(p2SpriteSheet,
@@ -163,6 +166,8 @@ public class GameScreen implements Screen {
         p2IdleFrame = p2Frames[0];
 
         p1Sprite = new Image(p1IdleFrame);
+        rootTable.add(p1Sprite).width(400).height(400).expand().center();
+
         p2Sprite = new Image(p2IdleFrame);
 
         rootTable.add(p1Sprite).width(150).height(150).expand().center();

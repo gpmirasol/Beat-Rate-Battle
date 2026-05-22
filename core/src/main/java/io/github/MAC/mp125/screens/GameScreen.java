@@ -807,7 +807,6 @@ public class GameScreen implements Screen {
         stage.draw();
 
         // Draw Notes and Receptors over the stage
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         // Dynamically align hitboxes to the actual UI buttons
         com.badlogic.gdx.math.Vector2 p1Pos = aBtn.localToStageCoordinates(new com.badlogic.gdx.math.Vector2(0, 0));
         com.badlogic.gdx.math.Vector2 p1NextPos = sBtn.localToStageCoordinates(new com.badlogic.gdx.math.Vector2(0, 0));
@@ -820,13 +819,6 @@ public class GameScreen implements Screen {
         // Calculate lane width based on the distance between the first two buttons
         laneWidth = p1NextPos.x - p1Pos.x;
         noteSize = aBtn.getWidth();
-
-        shapeRenderer.setColor(Color.WHITE);
-        for (int i = 0; i < 4; i++) {
-            shapeRenderer.rect(p1StartX + (i * laneWidth), receptorY, noteSize, noteSize);
-            shapeRenderer.rect(p2StartX + (i * laneWidth), receptorY, noteSize, noteSize);
-        }
-        shapeRenderer.end();
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

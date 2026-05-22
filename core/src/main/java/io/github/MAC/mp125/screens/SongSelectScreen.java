@@ -103,7 +103,7 @@ public class SongSelectScreen implements Screen {
         rootTable.add(startBanner)
                 .colspan(1)
                 .center()
-                .expandY()
+                .padBottom(40);
 
         System.out.println("Song Select Screen");
     }

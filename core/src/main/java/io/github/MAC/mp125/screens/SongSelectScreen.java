@@ -36,6 +36,10 @@ public class SongSelectScreen implements Screen {
     // full screen dynamic background (preview system)
     private Image songPreviewBackground;
 
+    private Texture appleBackgroundTexture;
+    private Texture beautyBackgroundTexture;
+    private Texture gentlemanBackgroundTexture;
+
     // song buttons
     private TextButton song1Button;
     private TextButton song2Button;
@@ -43,9 +47,6 @@ public class SongSelectScreen implements Screen {
 
     // overlay text
     private Label startBanner;
-
-    // preview (placeholder for now)
-    private Label songPreview;
 
     public SongSelectScreen(Game game) {
         this.game = game;
@@ -59,9 +60,13 @@ public class SongSelectScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        // initial song preview background (default state)
-        songPreviewBackground = new Image(
-                new Texture(Gdx.files.internal("bg.png")));
+        // BACKGROUND TEXTURES
+        appleBackgroundTexture = new Texture(Gdx.files.internal("applebackground.png"));
+        beautyBackgroundTexture = new Texture(Gdx.files.internal("beautybackground.png"));
+        gentlemanBackgroundTexture = new Texture(Gdx.files.internal("gentlemanbackground.png"));
+
+        // DEFAULT BACKGROUND
+        songPreviewBackground = new Image(appleBackgroundTexture);
 
         songPreviewBackground.setFillParent(true);
         stage.addActor(songPreviewBackground);
@@ -90,20 +95,15 @@ public class SongSelectScreen implements Screen {
         rootTable.row();
 
         // center preview text (fallback)
-        songPreview = new Label("SONG PREVIEW AREA", skin);
-        rootTable.add(songPreview).expand().center();
-
-        // overlay: start banner
-        startBanner = new Label("PRESS ENTER TO PLAY", skin);
-        rootTable.add(songPreview).expand().center();
 
         startBanner = new Label("PRESS ENTER TO PLAY", skin);
 
-        startBanner.setPosition(
-                Gdx.graphics.getWidth() / 2f - 150, 60);
+        rootTable.row();
 
-        startBanner.setVisible(true);
-        stage.addActor(startBanner);
+        rootTable.add(startBanner)
+                .colspan(1)
+                .center()
+                .expandY()
 
         System.out.println("Song Select Screen");
     }
@@ -134,6 +134,22 @@ public class SongSelectScreen implements Screen {
             song2Button.setColor(Color.GREEN);
         else if (selectedSongIndex == 2)
             song3Button.setColor(Color.GREEN);
+
+        // CHANGE BACKGROUND BASED ON SONG
+        if (selectedSongIndex == 0) {
+            songPreviewBackground.setDrawable(
+                new Image(appleBackgroundTexture).getDrawable());
+        }
+
+        else if (selectedSongIndex == 1) {
+            songPreviewBackground.setDrawable(
+                new Image(beautyBackgroundTexture).getDrawable());
+        }
+
+        else if (selectedSongIndex == 2) {
+            songPreviewBackground.setDrawable(
+                new Image(gentlemanBackgroundTexture).getDrawable());
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             game.setScreen(new GameScreen(game, songNames[selectedSongIndex]));
@@ -166,5 +182,8 @@ public class SongSelectScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        appleBackgroundTexture.dispose();
+        beautyBackgroundTexture.dispose();
+        gentlemanBackgroundTexture.dispose();
     }
 }

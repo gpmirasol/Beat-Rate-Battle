@@ -51,14 +51,13 @@ public class GameScreen implements Screen {
     private String songName;
 
     // Animation fields
-    private static final int FRAME_COLS = 3, FRAME_ROWS = 6;
+    private static final int FRAME_COLS = 3, FRAME_ROWS = 6; // Todo: Adjust based on sprite sheet Update: Done
     private static final int SPRITE_SIZE = 682;
     private Animation<TextureRegion> p1AnimW, p1AnimA, p1AnimS, p1AnimD, p1AnimMiss;
     private Animation<TextureRegion> p2AnimUp, p2AnimLeft, p2AnimDown, p2AnimRight, p2AnimMiss;
     private Animation<TextureRegion> p1CurrentAnim, p2CurrentAnim;
     private Texture p1SpriteSheet;
     private Texture p2SpriteSheet;
-    private Texture indicatorSpriteSheet;
     private float p1StateTime = 0f;
     private float p2StateTime = 0f;
     private float p1MissTimer = 0f;
@@ -66,7 +65,6 @@ public class GameScreen implements Screen {
     private float p1LabelTimer = 0f;
     private float p2LabelTimer = 0f;
     private Image p1HitGradeImage, p2HitGradeImage;
-    private Animation<TextureRegion> indAnimPerfect, indAnimAmazing, indAnimGood, indAnimMeh, indAnimBad, indAnimMiss;
     private Animation<TextureRegion> p1IndAnimPerfect, p1IndAnimAmazing, p1IndAnimGood, p1IndAnimMeh, p1IndAnimBad, p1IndAnimMiss;
     private Animation<TextureRegion> p2IndAnimPerfect, p2IndAnimAmazing, p2IndAnimGood, p2IndAnimMeh, p2IndAnimBad, p2IndAnimMiss;
     private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
@@ -76,12 +74,8 @@ public class GameScreen implements Screen {
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
-    private Image p1StreakImage, p2StreakImage;
-    private TextureRegion[] counterFrames;
     private int p1Score = 0;
     private int p2Score = 0;
-    private int p1PerfectStreak = 0;
-    private int p2PerfectStreak = 0;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -178,14 +172,6 @@ public class GameScreen implements Screen {
         middleTable.add(p1HitGradeImage).padRight(20).padTop(20).width(100).height(100);
         middleTable.add(p2HitGradeImage).padLeft(20).padTop(20).width(100).height(100);
 
-        middleTable.row();
-        p1StreakImage = new Image();
-        p2StreakImage = new Image();
-        p1StreakImage.setVisible(false);
-        p2StreakImage.setVisible(false);
-        middleTable.add(p1StreakImage).padRight(20).padTop(10).width(80).height(40);
-        middleTable.add(p2StreakImage).padLeft(20).padTop(10).width(80).height(40);
-
         rootTable.add(middleTable).expand().center().top();
 
         rootTable.add(p2Table).expand().right().pad(50).top();
@@ -230,32 +216,21 @@ public class GameScreen implements Screen {
         p2CurrentAnim = p2AnimUp;
         p2IdleFrame = p2Frames[0];
 
-        Texture counterSpriteSheet = new Texture(Gdx.files.internal("counterspritesheet.png"));
-        TextureRegion[][] counterTmp = TextureRegion.split(counterSpriteSheet,
-                counterSpriteSheet.getWidth() / 2,
-                counterSpriteSheet.getHeight() / 5);
-        counterFrames = new TextureRegion[10];
-        int counterIndex = 0;
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 2; j++) {
-                counterFrames[counterIndex++] = counterTmp[i][j];
-            }
-        }
+        p1IndAnimPerfect = new Animation<>(0.10f, p1Tmp[0]);
+        p1IndAnimAmazing = new Animation<>(0.10f, p1Tmp[1]);
+        p1IndAnimGood = new Animation<>(0.10f, p1Tmp[2]);
+        p1IndAnimMeh = new Animation<>(0.10f, p1Tmp[3]);
+        p1IndAnimBad = new Animation<>(0.10f, p1Tmp[4]);
+        p1IndAnimMiss = new Animation<>(0.10f, p1Tmp[5]);
+        p1CurrentIndAnim = p1IndAnimPerfect;
 
-        indicatorSpriteSheet = new Texture(Gdx.files.internal("indicatorspritesheet.png"));
-        TextureRegion[][] indTmp = TextureRegion.split(indicatorSpriteSheet,
-                indicatorSpriteSheet.getWidth() / 3,
-                indicatorSpriteSheet.getHeight() / 6);
-        
-        indAnimPerfect = new Animation<>(0.10f, indTmp[0]);
-        indAnimAmazing = new Animation<>(0.10f, indTmp[1]);
-        indAnimGood = new Animation<>(0.10f, indTmp[2]);
-        indAnimMeh = new Animation<>(0.10f, indTmp[3]);
-        indAnimBad = new Animation<>(0.10f, indTmp[4]);
-        indAnimMiss = new Animation<>(0.10f, indTmp[5]);
-        
-        p1CurrentIndAnim = indAnimPerfect;
-        p2CurrentIndAnim = indAnimPerfect;
+        p2IndAnimPerfect = new Animation<>(0.10f, p2Tmp[0]);
+        p2IndAnimAmazing = new Animation<>(0.10f, p2Tmp[1]);
+        p2IndAnimGood = new Animation<>(0.10f, p2Tmp[2]);
+        p2IndAnimMeh = new Animation<>(0.10f, p2Tmp[3]);
+        p2IndAnimBad = new Animation<>(0.10f, p2Tmp[4]);
+        p2IndAnimMiss = new Animation<>(0.10f, p2Tmp[5]);
+        p2CurrentIndAnim = p2IndAnimPerfect;
 
         p1Sprite = new Image(p1AnimIdle.getKeyFrame(0));
         p2Sprite = new Image(p2IdleFrame);
@@ -344,28 +319,14 @@ public class GameScreen implements Screen {
                         p1Score += points;
                         health += hpChange;
                         if (grade == HitGrade.BAD) p1MissTimer = 0.3f;
-                        if (grade == HitGrade.PERFECT) {
-                            p1PerfectStreak++;
-                            if (p1PerfectStreak > 10) p1PerfectStreak = 1;
-                        } else {
-                            p1PerfectStreak = 0;
-                        }
-
-                        if (p1PerfectStreak > 0) {
-                            p1StreakImage.setDrawable(new TextureRegionDrawable(counterFrames[p1PerfectStreak - 1]));
-                            p1StreakImage.setVisible(true);
-                        } else {
-                            p1StreakImage.setVisible(false);
-                        }
-
                         switch (grade) {
-                            case PERFECT: p1CurrentIndAnim = indAnimPerfect; break;
-                            case AMAZING: p1CurrentIndAnim = indAnimAmazing; break;
-                            case GOOD: p1CurrentIndAnim = indAnimGood; break;
-                            case MEH: p1CurrentIndAnim = indAnimMeh; break;
-                            case BAD: p1CurrentIndAnim = indAnimBad; break;
-                            case MISS: p1CurrentIndAnim = indAnimMiss; break;
-                            default: p1CurrentIndAnim = indAnimPerfect; break;
+                            case PERFECT: p1CurrentIndAnim = p1IndAnimPerfect; break;
+                            case AMAZING: p1CurrentIndAnim = p1IndAnimAmazing; break;
+                            case GOOD: p1CurrentIndAnim = p1IndAnimGood; break;
+                            case MEH: p1CurrentIndAnim = p1IndAnimMeh; break;
+                            case BAD: p1CurrentIndAnim = p1IndAnimBad; break;
+                            case MISS: p1CurrentIndAnim = p1IndAnimMiss; break;
+                            default: p1CurrentIndAnim = p1IndAnimPerfect; break;
                         }
                         p1IndStateTime = 0f;
                         p1HitGradeImage.setVisible(true);
@@ -374,28 +335,14 @@ public class GameScreen implements Screen {
                         p2Score += points;
                         health -= hpChange;
                         if (grade == HitGrade.BAD) p2MissTimer = 0.3f;
-                        if (grade == HitGrade.PERFECT) {
-                            p2PerfectStreak++;
-                            if (p2PerfectStreak > 10) p2PerfectStreak = 1;
-                        } else {
-                            p2PerfectStreak = 0;
-                        }
-
-                        if (p2PerfectStreak > 0) {
-                            p2StreakImage.setDrawable(new TextureRegionDrawable(counterFrames[p2PerfectStreak - 1]));
-                            p2StreakImage.setVisible(true);
-                        } else {
-                            p2StreakImage.setVisible(false);
-                        }
-
                         switch (grade) {
-                            case PERFECT: p2CurrentIndAnim = indAnimPerfect; break;
-                            case AMAZING: p2CurrentIndAnim = indAnimAmazing; break;
-                            case GOOD: p2CurrentIndAnim = indAnimGood; break;
-                            case MEH: p2CurrentIndAnim = indAnimMeh; break;
-                            case BAD: p2CurrentIndAnim = indAnimBad; break;
-                            case MISS: p2CurrentIndAnim = indAnimMiss; break;
-                            default: p2CurrentIndAnim = indAnimPerfect; break;
+                            case PERFECT: p2CurrentIndAnim = p2IndAnimPerfect; break;
+                            case AMAZING: p2CurrentIndAnim = p2IndAnimAmazing; break;
+                            case GOOD: p2CurrentIndAnim = p2IndAnimGood; break;
+                            case MEH: p2CurrentIndAnim = p2IndAnimMeh; break;
+                            case BAD: p2CurrentIndAnim = p2IndAnimBad; break;
+                            case MISS: p2CurrentIndAnim = p2IndAnimMiss; break;
+                            default: p2CurrentIndAnim = p2IndAnimPerfect; break;
                         }
                         p2IndStateTime = 0f;
                         p2HitGradeImage.setVisible(true);
@@ -416,21 +363,17 @@ public class GameScreen implements Screen {
                 if (isP1) {
                     health -= 2f;
                     p1MissTimer = 0.3f;
-                    p1CurrentIndAnim = indAnimMiss;
+                    p1CurrentIndAnim = p1IndAnimMiss;
                     p1IndStateTime = 0f;
                     p1HitGradeImage.setVisible(true);
                     p1LabelTimer = 1.0f;
-                    p1PerfectStreak = 0;
-                    p1StreakImage.setVisible(false);
                 } else {
                     health += 2f;
                     p2MissTimer = 0.3f;
-                    p2CurrentIndAnim = indAnimMiss;
+                    p2CurrentIndAnim = p2IndAnimMiss;
                     p2IndStateTime = 0f;
                     p2HitGradeImage.setVisible(true);
                     p2LabelTimer = 1.0f;
-                    p2PerfectStreak = 0;
-                    p2StreakImage.setVisible(false);
                 }
                 continue;
             }

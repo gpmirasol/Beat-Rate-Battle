@@ -68,10 +68,16 @@ public class GameScreen implements Screen {
     private int p2Score = 0;
 
     // P1 Keys
-    private TextButton wBtn, aBtn, sBtn, dBtn;
+    private Image wBtn, aBtn, sBtn, dBtn;
 
     // P2 Keys
-    private TextButton upBtn, leftBtn, downBtn, rightBtn;
+    private Image upBtn, leftBtn, downBtn, rightBtn;
+
+    private Texture texLeft, texDown, texUp, texRight;
+    private Texture texPressedLeft, texPressedDown, texPressedUp, texPressedRight;
+    private TextureRegionDrawable drawLeft, drawDown, drawUp, drawRight;
+    private TextureRegionDrawable drawPressedLeft, drawPressedDown, drawPressedUp, drawPressedRight;
+    private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
 
     public GameScreen(Game game, String songName) {
         this.game = game;
@@ -92,28 +98,53 @@ public class GameScreen implements Screen {
         rootTable.setFillParent(true);
         stage.addActor(rootTable);
 
+        texLeft = new Texture(Gdx.files.internal("basenote_left.png"));
+        texDown = new Texture(Gdx.files.internal("basenote_down.png"));
+        texUp = new Texture(Gdx.files.internal("basenote_up.png"));
+        texRight = new Texture(Gdx.files.internal("basenote_right.png"));
+
+        texPressedLeft = new Texture(Gdx.files.internal("notepressed_left.png"));
+        texPressedDown = new Texture(Gdx.files.internal("notepressed_down.png"));
+        texPressedUp = new Texture(Gdx.files.internal("notepressed_up.png"));
+        texPressedRight = new Texture(Gdx.files.internal("notepressed_right.png"));
+
+        drawLeft = new TextureRegionDrawable(texLeft);
+        drawDown = new TextureRegionDrawable(texDown);
+        drawUp = new TextureRegionDrawable(texUp);
+        drawRight = new TextureRegionDrawable(texRight);
+
+        drawPressedLeft = new TextureRegionDrawable(texPressedLeft);
+        drawPressedDown = new TextureRegionDrawable(texPressedDown);
+        drawPressedUp = new TextureRegionDrawable(texPressedUp);
+        drawPressedRight = new TextureRegionDrawable(texPressedRight);
+
+        flyTexLeft = new Texture(Gdx.files.internal("flyingnote_left.png"));
+        flyTexDown = new Texture(Gdx.files.internal("flyingnote_down.png"));
+        flyTexUp = new Texture(Gdx.files.internal("flyingnote_up.png"));
+        flyTexRight = new Texture(Gdx.files.internal("flyingnote_right.png"));
+
         // Player 1 Buttons (WASD)
-        wBtn = new TextButton("W", skin);
-        aBtn = new TextButton("A", skin);
-        sBtn = new TextButton("S", skin);
-        dBtn = new TextButton("D", skin);
+        wBtn = new Image(texUp);
+        aBtn = new Image(texLeft);
+        sBtn = new Image(texDown);
+        dBtn = new Image(texRight);
 
         Table p1Table = new Table();
-        p1Table.add(wBtn).width(60).height(60).pad(5);
         p1Table.add(aBtn).width(60).height(60).pad(5);
         p1Table.add(sBtn).width(60).height(60).pad(5);
+        p1Table.add(wBtn).width(60).height(60).pad(5);
         p1Table.add(dBtn).width(60).height(60).pad(5);
 
         // Player 2 Buttons (Arrows)
-        upBtn = new TextButton("^", skin);
-        leftBtn = new TextButton("<", skin);
-        downBtn = new TextButton("v", skin);
-        rightBtn = new TextButton(">", skin);
+        upBtn = new Image(texUp);
+        leftBtn = new Image(texLeft);
+        downBtn = new Image(texDown);
+        rightBtn = new Image(texRight);
 
         Table p2Table = new Table();
-        p2Table.add(upBtn).width(60).height(60).pad(5);
         p2Table.add(leftBtn).width(60).height(60).pad(5);
         p2Table.add(downBtn).width(60).height(60).pad(5);
+        p2Table.add(upBtn).width(60).height(60).pad(5);
         p2Table.add(rightBtn).width(60).height(60).pad(5);
 
         // Add to root table
@@ -139,14 +170,14 @@ public class GameScreen implements Screen {
         }
 
         // Todo: Assign animations based on rows (each row = 3 frames)
-        // Todo: Row 0: IDLE, Row 1: Up(W), Row 2: Left(A), Row 3: Down(S), Row 4: Right(D), Row 5: Miss
+        // Todo: Row 0: IDLE, Row 1: Up(W), Row 2: Left(A), Row 3: Down(S), Row 4:
+        // Right(D), Row 5: Miss
         p1AnimIdle = new Animation<>(0.10f, p1Tmp[0]);
         p1AnimW = new Animation<>(0.10f, p1Tmp[1]);
         p1AnimA = new Animation<>(0.10f, p1Tmp[2]);
         p1AnimS = new Animation<>(0.10f, p1Tmp[3]);
         p1AnimD = new Animation<>(0.10f, p1Tmp[4]);
         p1CurrentAnim = p1AnimIdle;
-
 
         p2SpriteSheet = new Texture(Gdx.files.internal("kooacharsel.png"));
         TextureRegion[][] p2Tmp = TextureRegion.split(p2SpriteSheet,
@@ -201,10 +232,13 @@ public class GameScreen implements Screen {
         System.out.println("Game Screen Started");
     }
 
-    private boolean updateButtonState(TextButton btn, int keycode) {
+    private boolean updateButtonState(Image btn, TextureRegionDrawable unpressed, TextureRegionDrawable pressed,
+            int keycode) {
         if (Gdx.input.isKeyPressed(keycode)) {
-            btn.setColor(Color.GREEN);
+            btn.setDrawable(pressed);
+            btn.setColor(Color.WHITE); // Ensure no green tint is left
         } else {
+            btn.setDrawable(unpressed);
             btn.setColor(Color.WHITE);
         }
         return Gdx.input.isKeyJustPressed(keycode);
@@ -275,25 +309,23 @@ public class GameScreen implements Screen {
 
             // Draw if it's on screen
             if (noteY > -noteSize && noteY < Gdx.graphics.getHeight()) {
+                Texture texToDraw = flyTexLeft;
                 switch (note.laneIndex) {
                     case 0:
-                        shapeRenderer.setColor(Color.PURPLE);
+                        texToDraw = flyTexLeft;
                         break;
                     case 1:
-                        shapeRenderer.setColor(Color.CYAN);
+                        texToDraw = flyTexDown;
                         break;
                     case 2:
-                        shapeRenderer.setColor(Color.GREEN);
+                        texToDraw = flyTexUp;
                         break;
                     case 3:
-                        shapeRenderer.setColor(Color.RED);
-                        break;
-                    default:
-                        shapeRenderer.setColor(Color.WHITE);
+                        texToDraw = flyTexRight;
                         break;
                 }
                 float noteX = startX + (note.laneIndex * laneWidth);
-                shapeRenderer.rect(noteX, noteY, noteSize, noteSize);
+                stage.getBatch().draw(texToDraw, noteX, noteY, noteSize, noteSize);
             }
         }
     }
@@ -311,10 +343,10 @@ public class GameScreen implements Screen {
         }
 
         // Update P1 Keys
-        boolean wPressed = updateButtonState(wBtn, Input.Keys.W);
-        boolean aPressed = updateButtonState(aBtn, Input.Keys.A);
-        boolean sPressed = updateButtonState(sBtn, Input.Keys.S);
-        boolean dPressed = updateButtonState(dBtn, Input.Keys.D);
+        boolean wPressed = updateButtonState(wBtn, drawUp, drawPressedUp, Input.Keys.W);
+        boolean aPressed = updateButtonState(aBtn, drawLeft, drawPressedLeft, Input.Keys.A);
+        boolean sPressed = updateButtonState(sBtn, drawDown, drawPressedDown, Input.Keys.S);
+        boolean dPressed = updateButtonState(dBtn, drawRight, drawPressedRight, Input.Keys.D);
 
         if (aPressed)
             processHitAttempt(p1Notes, 0, true);
@@ -326,10 +358,10 @@ public class GameScreen implements Screen {
             processHitAttempt(p1Notes, 3, true);
 
         // Update P2 Keys
-        boolean upPressed = updateButtonState(upBtn, Input.Keys.UP);
-        boolean leftPressed = updateButtonState(leftBtn, Input.Keys.LEFT);
-        boolean downPressed = updateButtonState(downBtn, Input.Keys.DOWN);
-        boolean rightPressed = updateButtonState(rightBtn, Input.Keys.RIGHT);
+        boolean upPressed = updateButtonState(upBtn, drawUp, drawPressedUp, Input.Keys.UP);
+        boolean leftPressed = updateButtonState(leftBtn, drawLeft, drawPressedLeft, Input.Keys.LEFT);
+        boolean downPressed = updateButtonState(downBtn, drawDown, drawPressedDown, Input.Keys.DOWN);
+        boolean rightPressed = updateButtonState(rightBtn, drawRight, drawPressedRight, Input.Keys.RIGHT);
 
         if (leftPressed)
             processHitAttempt(p2Notes, 0, false);
@@ -445,10 +477,10 @@ public class GameScreen implements Screen {
         }
         shapeRenderer.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        stage.getBatch().begin();
         updateAndDrawNotes(p1Notes, p1StartX, true);
         updateAndDrawNotes(p2Notes, p2StartX, false);
-        shapeRenderer.end();
+        stage.getBatch().end();
     }
 
     @Override
@@ -496,6 +528,29 @@ public class GameScreen implements Screen {
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
         }
-
+        if (texLeft != null)
+            texLeft.dispose();
+        if (texDown != null)
+            texDown.dispose();
+        if (texUp != null)
+            texUp.dispose();
+        if (texRight != null)
+            texRight.dispose();
+        if (texPressedLeft != null)
+            texPressedLeft.dispose();
+        if (texPressedDown != null)
+            texPressedDown.dispose();
+        if (texPressedUp != null)
+            texPressedUp.dispose();
+        if (texPressedRight != null)
+            texPressedRight.dispose();
+        if (flyTexLeft != null)
+            flyTexLeft.dispose();
+        if (flyTexDown != null)
+            flyTexDown.dispose();
+        if (flyTexUp != null)
+            flyTexUp.dispose();
+        if (flyTexRight != null)
+            flyTexRight.dispose();
     }
 }

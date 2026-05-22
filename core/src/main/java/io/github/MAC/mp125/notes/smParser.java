@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class smParser {
@@ -13,7 +15,7 @@ public class smParser {
     public static ConcurrentLinkedQueue<GameNote> parseChart(String internalAssetPath, int targetPlayerID) {
         ConcurrentLinkedQueue<GameNote> gameTimeline = new ConcurrentLinkedQueue<>();
 
-        double bpm = 120.0;
+        TreeMap<Double, Double> bpmChanges = new TreeMap<>();
         double offsetSeconds = 0.0;
         List<String> rawNoteLines = new ArrayList<>();
 
@@ -35,11 +37,19 @@ public class smParser {
                     continue;
 
                 if (line.startsWith("#BPMS:")) {
-                    int semiIndex = line.indexOf(";");
-                    String content = (semiIndex != -1) ? line.substring(6, semiIndex) : line.substring(6);
-                    if (content.contains("=")) {
-                        String[] parts = content.split("=");
-                        bpm = Double.parseDouble(parts[1]);
+                    StringBuilder bpmString = new StringBuilder(line.substring(6));
+                    while (!bpmString.toString().contains(";") && reader.ready()) {
+                        String nextLine = reader.readLine();
+                        if (nextLine == null) break;
+                        bpmString.append(nextLine.trim());
+                    }
+                    String content = bpmString.toString().replace(";", "");
+                    String[] changes = content.split(",");
+                    for (String change : changes) {
+                        String[] parts = change.split("=");
+                        if (parts.length == 2) {
+                            bpmChanges.put(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
+                        }
                     }
                 } else if (line.startsWith("#OFFSET:")) {
                     int semiIndex = line.indexOf(";");
@@ -68,10 +78,9 @@ public class smParser {
         }
 
         // Phase 2: Compute math spacing rules
-        double beatsPerSecond = bpm / 60.0;
-        double secondsPerMeasure = 4.0 / beatsPerSecond;
-        double msPerMeasure = secondsPerMeasure * 1000.0;
-        long globalSongStartOffsetMs = Math.round(offsetSeconds * 1000.0);
+        if (bpmChanges.isEmpty()) {
+            bpmChanges.put(0.0, 120.0);
+        }
 
         List<List<String>> measuresList = new ArrayList<>();
         List<String> currentMeasure = new ArrayList<>();
@@ -89,26 +98,49 @@ public class smParser {
         }
 
         // Phase 3: Build Note objects dynamically
-        double accumulatedTimeMs = globalSongStartOffsetMs;
+        // StepMania offset rule: Time = Beat * (60/BPM) - Offset
+        // So beat 0 happens at -Offset seconds
+        double accumulatedTimeMs = -offsetSeconds * 1000.0;
+        GameNote[] activeHolds = new GameNote[4];
+        double currentBeat = 0.0;
 
         for (List<String> measure : measuresList) {
             int rowsInThisMeasure = measure.size();
             if (rowsInThisMeasure == 0)
                 continue;
 
-            double msPerRowFraction = msPerMeasure / rowsInThisMeasure;
+            double beatsPerRow = 4.0 / rowsInThisMeasure;
 
             for (int rowIndex = 0; rowIndex < rowsInThisMeasure; rowIndex++) {
-                String noteBitmask = measure.get(rowIndex);
-                long accurateHitTimestampMs = Math.round(accumulatedTimeMs + (rowIndex * msPerRowFraction));
+                Map.Entry<Double, Double> entry = bpmChanges.floorEntry(currentBeat + 0.001);
+                double activeBpm = (entry != null) ? entry.getValue() : 120.0;
+                double msPerRow = (beatsPerRow * 60.0 / activeBpm) * 1000.0;
 
+                long accurateHitTimestampMs = Math.round(accumulatedTimeMs);
+
+                String noteBitmask = measure.get(rowIndex);
                 for (int laneColumn = 0; laneColumn < 4; laneColumn++) {
-                    if (laneColumn < noteBitmask.length() && noteBitmask.charAt(laneColumn) == '1') {
-                        gameTimeline.add(new GameNote(accurateHitTimestampMs, laneColumn, targetPlayerID));
+                    if (laneColumn < noteBitmask.length()) {
+                        char c = noteBitmask.charAt(laneColumn);
+                        if (c == '1') {
+                            gameTimeline.add(new GameNote(accurateHitTimestampMs, laneColumn, targetPlayerID));
+                        } else if (c == '2') {
+                            GameNote holdNote = new GameNote(accurateHitTimestampMs, laneColumn, targetPlayerID);
+                            holdNote.isHoldNote = true;
+                            activeHolds[laneColumn] = holdNote;
+                            gameTimeline.add(holdNote);
+                        } else if (c == '3') {
+                            if (activeHolds[laneColumn] != null) {
+                                activeHolds[laneColumn].endTimeMs = accurateHitTimestampMs;
+                                activeHolds[laneColumn] = null;
+                            }
+                        }
                     }
                 }
+
+                accumulatedTimeMs += msPerRow;
+                currentBeat += beatsPerRow;
             }
-            accumulatedTimeMs += msPerMeasure;
         }
 
         Gdx.app.log("Parser", "Loaded " + gameTimeline.size() + " active notes from .sm for Player " + targetPlayerID);

@@ -314,7 +314,11 @@ public class GameScreen implements Screen {
             if (note.laneIndex == laneIndex) {
                 HitGrade grade = HitDetector.evaluateHit(note.targetTimeMs, currentSongTimeMs);
                 if (grade != HitGrade.NONE && grade != HitGrade.MISS) {
-                    iterator.remove();
+                    if (note.isHoldNote) {
+                        note.isBeingHeld = true;
+                    } else {
+                        iterator.remove();
+                    }
                     int points = 0;
                     float hpChange = 0;
                     switch (grade) {
@@ -348,6 +352,9 @@ public class GameScreen implements Screen {
                             p1MissTimer = 0.3f;
                         if (grade == HitGrade.PERFECT) {
                             p1PerfectStreak++;
+                            if (p1PerfectStreak == 10) {
+                                setOpponentToHardChart(false);
+                            }
                             if (p1PerfectStreak > 10)
                                 p1PerfectStreak = 1;
                         } else {
@@ -394,6 +401,9 @@ public class GameScreen implements Screen {
                             p2MissTimer = 0.3f;
                         if (grade == HitGrade.PERFECT) {
                             p2PerfectStreak++;
+                            if (p2PerfectStreak == 10) {
+                                setOpponentToHardChart(true);
+                            }
                             if (p2PerfectStreak > 10)
                                 p2PerfectStreak = 1;
                         } else {
@@ -440,11 +450,44 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void setOpponentToHardChart(boolean isP1TheOpponent) {
+        String hardChartPath = songName + "_hard.sm";
+        if (!Gdx.files.internal(hardChartPath).exists()) {
+            return;
+        }
+
+        int targetPlayerID = isP1TheOpponent ? 1 : 2;
+        ConcurrentLinkedQueue<GameNote> hardNotes = smParser.parseChart(hardChartPath, targetPlayerID);
+        
+        long safeTime = currentSongTimeMs + 1000; 
+        ConcurrentLinkedQueue<GameNote> finalQueue = new ConcurrentLinkedQueue<>();
+        
+        ConcurrentLinkedQueue<GameNote> currentNotes = isP1TheOpponent ? p1Notes : p2Notes;
+        
+        for (GameNote oldNote : currentNotes) {
+            if (oldNote.targetTimeMs <= safeTime) {
+                finalQueue.add(oldNote);
+            }
+        }
+        
+        for (GameNote newNote : hardNotes) {
+            if (newNote.targetTimeMs > safeTime) {
+                finalQueue.add(newNote);
+            }
+        }
+        
+        if (isP1TheOpponent) {
+            p1Notes = finalQueue;
+        } else {
+            p2Notes = finalQueue;
+        }
+    }
+
     private void updateAndDrawNotes(ConcurrentLinkedQueue<GameNote> notes, float startX, boolean isP1) {
         Iterator<GameNote> iterator = notes.iterator();
         while (iterator.hasNext()) {
             GameNote note = iterator.next();
-            if (HitDetector.hasMissed(note.targetTimeMs, currentSongTimeMs)) {
+            if (HitDetector.hasMissed(note.targetTimeMs, currentSongTimeMs) && !note.isBeingHeld) {
                 iterator.remove();
                 if (isP1) {
                     health -= 2f;
@@ -466,6 +509,55 @@ public class GameScreen implements Screen {
                     p2StreakImage.setVisible(false);
                 }
                 continue;
+            }
+
+            if (note.isHoldNote && note.isBeingHeld) {
+                boolean isPressed = false;
+                if (isP1) {
+                    if (note.laneIndex == 0) isPressed = Gdx.input.isKeyPressed(Input.Keys.A);
+                    else if (note.laneIndex == 1) isPressed = Gdx.input.isKeyPressed(Input.Keys.S);
+                    else if (note.laneIndex == 2) isPressed = Gdx.input.isKeyPressed(Input.Keys.W);
+                    else if (note.laneIndex == 3) isPressed = Gdx.input.isKeyPressed(Input.Keys.D);
+                } else {
+                    if (note.laneIndex == 0) isPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
+                    else if (note.laneIndex == 1) isPressed = Gdx.input.isKeyPressed(Input.Keys.DOWN);
+                    else if (note.laneIndex == 2) isPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
+                    else if (note.laneIndex == 3) isPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+                }
+
+                if (!isPressed) {
+                    iterator.remove();
+                    if (isP1) {
+                        health -= 2f;
+                        p1MissTimer = 0.3f;
+                        p1CurrentIndAnim = indAnimMiss;
+                        p1IndStateTime = 0f;
+                        p1HitGradeImage.setVisible(true);
+                        p1LabelTimer = 1.0f;
+                        p1PerfectStreak = 0;
+                        p1StreakImage.setVisible(false);
+                    } else {
+                        health += 2f;
+                        p2MissTimer = 0.3f;
+                        p2CurrentIndAnim = indAnimMiss;
+                        p2IndStateTime = 0f;
+                        p2HitGradeImage.setVisible(true);
+                        p2LabelTimer = 1.0f;
+                        p2PerfectStreak = 0;
+                        p2StreakImage.setVisible(false);
+                    }
+                    continue;
+                } else if (currentSongTimeMs >= note.endTimeMs) {
+                    iterator.remove();
+                    if (isP1) {
+                        p1Score += 10;
+                        health += 1f;
+                    } else {
+                        p2Score += 10;
+                        health -= 1f;
+                    }
+                    continue;
+                }
             }
 
             float timeRemaining = note.targetTimeMs - currentSongTimeMs;
@@ -674,6 +766,14 @@ public class GameScreen implements Screen {
         }
         shapeRenderer.end();
 
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        drawHoldBodies(p1Notes, p1StartX);
+        drawHoldBodies(p2Notes, p2StartX);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
         stage.getBatch().begin();
         updateAndDrawNotes(p1Notes, p1StartX, true);
         updateAndDrawNotes(p2Notes, p2StartX, false);
@@ -749,5 +849,29 @@ public class GameScreen implements Screen {
             flyTexUp.dispose();
         if (flyTexRight != null)
             flyTexRight.dispose();
+    }
+
+    private void drawHoldBodies(ConcurrentLinkedQueue<GameNote> notes, float startX) {
+        for (GameNote note : notes) {
+            if (note.isHoldNote) {
+                float timeRemaining = note.targetTimeMs - currentSongTimeMs;
+                float noteY = receptorY - (timeRemaining * scrollSpeedFactor);
+                
+                float endTimeRemaining = note.endTimeMs - currentSongTimeMs;
+                float endNoteY = receptorY - (endTimeRemaining * scrollSpeedFactor);
+                
+                if (note.isBeingHeld || noteY > receptorY) {
+                    noteY = receptorY;
+                }
+                
+                float height = noteY - endNoteY;
+                if (height < 0) continue;
+                
+                float noteX = startX + (note.laneIndex * laneWidth);
+                
+                shapeRenderer.setColor(0.5f, 0.8f, 1f, 0.7f); // Semi-transparent blue
+                shapeRenderer.rect(noteX + noteSize*0.3f, endNoteY + noteSize*0.5f, noteSize*0.4f, height);
+            }
+        }
     }
 }

@@ -5,6 +5,9 @@ public class GameNote {
     public int laneIndex; // 0 = Left, 1 = Down, 2 = Up, 3 = Right
     public int playerID; // 1 = Player 1, 2 = Player 2
     public float yCoordinate; // Used by your LibGDX sprite renderer to draw the arrow
+    public boolean isHoldNote = false;
+    public long endTimeMs = 0;
+    public boolean isBeingHeld = false;
 
     public GameNote(long targetTimeMs, int laneIndex, int playerID) {
         this.targetTimeMs = targetTimeMs;

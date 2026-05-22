@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
@@ -61,6 +62,13 @@ public class GameScreen implements Screen {
     private float p2StateTime = 0f;
     private float p1MissTimer = 0f;
     private float p2MissTimer = 0f;
+    private float p1LabelTimer = 0f;
+    private float p2LabelTimer = 0f;
+    private Image p1HitGradeImage, p2HitGradeImage;
+    private Animation<TextureRegion> p1IndAnimPerfect, p1IndAnimAmazing, p1IndAnimGood, p1IndAnimMeh, p1IndAnimBad, p1IndAnimMiss;
+    private Animation<TextureRegion> p2IndAnimPerfect, p2IndAnimAmazing, p2IndAnimGood, p2IndAnimMeh, p2IndAnimBad, p2IndAnimMiss;
+    private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
+    private float p1IndStateTime = 0f, p2IndStateTime = 0f;
     private Animation<TextureRegion> p1AnimIdle;
     private TextureRegion p2IdleFrame;
     private Image p1Sprite, p2Sprite;
@@ -154,7 +162,17 @@ public class GameScreen implements Screen {
 
         healthBar = new ProgressBar(0, 100, 1, false, skin);
         healthBar.setValue(health);
-        rootTable.add(healthBar).expand().center().top().padTop(70).width(300);
+        
+        Table middleTable = new Table();
+        middleTable.add(healthBar).colspan(2).center().top().padTop(70).width(300);
+        middleTable.row();
+        
+        p1HitGradeImage = new Image();
+        p2HitGradeImage = new Image();
+        middleTable.add(p1HitGradeImage).padRight(20).padTop(20).width(100).height(100);
+        middleTable.add(p2HitGradeImage).padLeft(20).padTop(20).width(100).height(100);
+
+        rootTable.add(middleTable).expand().center().top();
 
         rootTable.add(p2Table).expand().right().pad(50).top();
 
@@ -198,9 +216,27 @@ public class GameScreen implements Screen {
         p2CurrentAnim = p2AnimUp;
         p2IdleFrame = p2Frames[0];
 
-        p1Sprite = new Image(p1AnimIdle.getKeyFrame(0));
+        p1IndAnimPerfect = new Animation<>(0.10f, p1Tmp[0]);
+        p1IndAnimAmazing = new Animation<>(0.10f, p1Tmp[1]);
+        p1IndAnimGood = new Animation<>(0.10f, p1Tmp[2]);
+        p1IndAnimMeh = new Animation<>(0.10f, p1Tmp[3]);
+        p1IndAnimBad = new Animation<>(0.10f, p1Tmp[4]);
+        p1IndAnimMiss = new Animation<>(0.10f, p1Tmp[5]);
+        p1CurrentIndAnim = p1IndAnimPerfect;
 
+        p2IndAnimPerfect = new Animation<>(0.10f, p2Tmp[0]);
+        p2IndAnimAmazing = new Animation<>(0.10f, p2Tmp[1]);
+        p2IndAnimGood = new Animation<>(0.10f, p2Tmp[2]);
+        p2IndAnimMeh = new Animation<>(0.10f, p2Tmp[3]);
+        p2IndAnimBad = new Animation<>(0.10f, p2Tmp[4]);
+        p2IndAnimMiss = new Animation<>(0.10f, p2Tmp[5]);
+        p2CurrentIndAnim = p2IndAnimPerfect;
+
+        p1Sprite = new Image(p1AnimIdle.getKeyFrame(0));
         p2Sprite = new Image(p2IdleFrame);
+
+        p1HitGradeImage.setVisible(false);
+        p2HitGradeImage.setVisible(false);
 
         rootTable.add(p1Sprite).width(150).height(150).expand().center();
         rootTable.add().expand().center(); // spacer for the middle column
@@ -282,13 +318,35 @@ public class GameScreen implements Screen {
                     if (isP1) {
                         p1Score += points;
                         health += hpChange;
-                        if (grade == HitGrade.BAD)
-                            p1MissTimer = 0.3f;
+                        if (grade == HitGrade.BAD) p1MissTimer = 0.3f;
+                        switch (grade) {
+                            case PERFECT: p1CurrentIndAnim = p1IndAnimPerfect; break;
+                            case AMAZING: p1CurrentIndAnim = p1IndAnimAmazing; break;
+                            case GOOD: p1CurrentIndAnim = p1IndAnimGood; break;
+                            case MEH: p1CurrentIndAnim = p1IndAnimMeh; break;
+                            case BAD: p1CurrentIndAnim = p1IndAnimBad; break;
+                            case MISS: p1CurrentIndAnim = p1IndAnimMiss; break;
+                            default: p1CurrentIndAnim = p1IndAnimPerfect; break;
+                        }
+                        p1IndStateTime = 0f;
+                        p1HitGradeImage.setVisible(true);
+                        p1LabelTimer = 1.0f;
                     } else {
                         p2Score += points;
                         health -= hpChange;
-                        if (grade == HitGrade.BAD)
-                            p2MissTimer = 0.3f;
+                        if (grade == HitGrade.BAD) p2MissTimer = 0.3f;
+                        switch (grade) {
+                            case PERFECT: p2CurrentIndAnim = p2IndAnimPerfect; break;
+                            case AMAZING: p2CurrentIndAnim = p2IndAnimAmazing; break;
+                            case GOOD: p2CurrentIndAnim = p2IndAnimGood; break;
+                            case MEH: p2CurrentIndAnim = p2IndAnimMeh; break;
+                            case BAD: p2CurrentIndAnim = p2IndAnimBad; break;
+                            case MISS: p2CurrentIndAnim = p2IndAnimMiss; break;
+                            default: p2CurrentIndAnim = p2IndAnimPerfect; break;
+                        }
+                        p2IndStateTime = 0f;
+                        p2HitGradeImage.setVisible(true);
+                        p2LabelTimer = 1.0f;
                     }
                     return;
                 }
@@ -305,9 +363,17 @@ public class GameScreen implements Screen {
                 if (isP1) {
                     health -= 2f;
                     p1MissTimer = 0.3f;
+                    p1CurrentIndAnim = p1IndAnimMiss;
+                    p1IndStateTime = 0f;
+                    p1HitGradeImage.setVisible(true);
+                    p1LabelTimer = 1.0f;
                 } else {
                     health += 2f;
                     p2MissTimer = 0.3f;
+                    p2CurrentIndAnim = p2IndAnimMiss;
+                    p2IndStateTime = 0f;
+                    p2HitGradeImage.setVisible(true);
+                    p2LabelTimer = 1.0f;
                 }
                 continue;
             }
@@ -448,6 +514,19 @@ public class GameScreen implements Screen {
         } else {
             p2StateTime = 0f;
             p2Sprite.setDrawable(new TextureRegionDrawable(p2IdleFrame));
+        }
+
+        if (p1LabelTimer > 0) {
+            p1LabelTimer -= delta;
+            p1IndStateTime += delta;
+            p1HitGradeImage.setDrawable(new TextureRegionDrawable(p1CurrentIndAnim.getKeyFrame(p1IndStateTime, true)));
+            if (p1LabelTimer <= 0) p1HitGradeImage.setVisible(false);
+        }
+        if (p2LabelTimer > 0) {
+            p2LabelTimer -= delta;
+            p2IndStateTime += delta;
+            p2HitGradeImage.setDrawable(new TextureRegionDrawable(p2CurrentIndAnim.getKeyFrame(p2IndStateTime, true)));
+            if (p2LabelTimer <= 0) p2HitGradeImage.setVisible(false);
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

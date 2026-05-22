@@ -403,6 +403,28 @@ public class GameScreen implements Screen {
             return; // Prevent further rendering with disposed resources
         }
 
+        // Check if the song/level has finished
+        boolean isFinished = false;
+        if (backgroundMusic != null) {
+            // If music was playing and has now stopped (and we're past the first second to
+            // avoid early triggers)
+            if (!backgroundMusic.isPlaying() && currentSongTimeMs > 1000) {
+                isFinished = true;
+            }
+        } else {
+            // Fallback if no music file is present: check if all notes are cleared and at
+            // least 1 second has passed
+            if (p1Notes.isEmpty() && p2Notes.isEmpty() && currentSongTimeMs > 1000) {
+                isFinished = true;
+            }
+        }
+
+        if (isFinished) {
+            game.setScreen(new ResultsScreen(game));
+            dispose();
+            return;
+        }
+
         stage.act(delta);
         stage.draw();
 

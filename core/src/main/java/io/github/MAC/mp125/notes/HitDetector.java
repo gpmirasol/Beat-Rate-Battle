@@ -5,14 +5,12 @@ public class HitDetector {
     // These are the timing windows in milliseconds (how early/late a player can
     // be).
     // You can adjust these numbers to make the game easier or harder!
-    public static final int WINDOW_PERFECT = 22;
-    public static final int WINDOW_AMAZING = 45;
+    public static final int WINDOW_PERFECT = 45;
     public static final int WINDOW_GOOD = 90;
     public static final int WINDOW_MEH = 135;
-    public static final int WINDOW_BAD = 180;
 
     public enum HitGrade {
-        PERFECT, AMAZING, GOOD, MEH, BAD, MISS, NONE
+        PERFECT, GOOD, MEH, MISS, NONE
     }
 
     /**
@@ -27,14 +25,10 @@ public class HitDetector {
 
         if (timeDifference <= WINDOW_PERFECT)
             return HitGrade.PERFECT;
-        if (timeDifference <= WINDOW_AMAZING)
-            return HitGrade.AMAZING;
         if (timeDifference <= WINDOW_GOOD)
             return HitGrade.GOOD;
         if (timeDifference <= WINDOW_MEH)
             return HitGrade.MEH;
-        if (timeDifference <= WINDOW_BAD)
-            return HitGrade.BAD;
 
         // If they pressed way too early, don't count it as a hit attempt yet
         return HitGrade.NONE;
@@ -47,6 +41,6 @@ public class HitDetector {
     public static boolean hasMissed(long targetTimeMs, long currentSongTimeMs) {
         // If the current time has passed the target time by MORE than the worst timing
         // window, it's a miss
-        return (currentSongTimeMs - targetTimeMs) > WINDOW_BAD;
+        return (currentSongTimeMs - targetTimeMs) > WINDOW_MEH;
     }
 }

@@ -19,14 +19,14 @@ public class smParser {
         double offsetSeconds = 0.0;
         List<String> rawNoteLines = new ArrayList<>();
 
-        // Use LibGDX file internal handler to native asset paths safely
+        // find .sm file in assets
         FileHandle file = Gdx.files.internal(internalAssetPath);
         if (!file.exists()) {
             Gdx.app.error("Parser", "Target .sm chart file not found: " + internalAssetPath);
             return gameTimeline;
         }
 
-        // Phase 1: Read structural tags and isolate note mappings
+        // read .sm file and extract note mappings
         try (BufferedReader reader = new BufferedReader(file.reader())) {
             String line;
             boolean insideNotesSection = false;
@@ -40,7 +40,8 @@ public class smParser {
                     StringBuilder bpmString = new StringBuilder(line.substring(6));
                     while (!bpmString.toString().contains(";") && reader.ready()) {
                         String nextLine = reader.readLine();
-                        if (nextLine == null) break;
+                        if (nextLine == null)
+                            break;
                         bpmString.append(nextLine.trim());
                     }
                     String content = bpmString.toString().replace(";", "");
@@ -77,7 +78,7 @@ public class smParser {
             return gameTimeline;
         }
 
-        // Phase 2: Compute math spacing rules
+        // breaks the .sm into measures
         if (bpmChanges.isEmpty()) {
             bpmChanges.put(0.0, 120.0);
         }
@@ -97,9 +98,7 @@ public class smParser {
             measuresList.add(currentMeasure);
         }
 
-        // Phase 3: Build Note objects dynamically
-        // StepMania offset rule: Time = Beat * (60/BPM) - Offset
-        // So beat 0 happens at -Offset seconds
+        // turns the measures into actual notes
         double accumulatedTimeMs = -offsetSeconds * 1000.0;
         GameNote[] activeHolds = new GameNote[4];
         double currentBeat = 0.0;

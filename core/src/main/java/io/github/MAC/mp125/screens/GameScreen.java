@@ -66,7 +66,7 @@ public class GameScreen implements Screen {
     private float p1LabelTimer = 0f;
     private float p2LabelTimer = 0f;
     private Image p1HitGradeImage, p2HitGradeImage;
-    private Animation<TextureRegion> indAnimPerfect, indAnimAmazing, indAnimGood, indAnimMeh, indAnimBad, indAnimMiss;
+    private Animation<TextureRegion> indAnimPerfect, indAnimGood, indAnimMeh, indAnimMiss;
     private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
     private float p1IndStateTime = 0f, p2IndStateTime = 0f;
     private Animation<TextureRegion> p1AnimIdle;
@@ -83,6 +83,8 @@ public class GameScreen implements Screen {
     private int p2PerfectStreak = 0;
     private float p1HardModeTimer = 0f;
     private float p2HardModeTimer = 0f;
+    private io.github.MAC.mp125.PlayerStats p1Stats = new io.github.MAC.mp125.PlayerStats();
+    private io.github.MAC.mp125.PlayerStats p2Stats = new io.github.MAC.mp125.PlayerStats();
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -250,10 +252,8 @@ public class GameScreen implements Screen {
                 indicatorSpriteSheet.getHeight() / 6);
 
         indAnimPerfect = new Animation<>(0.10f, indTmp[0]);
-        indAnimAmazing = new Animation<>(0.10f, indTmp[1]);
         indAnimGood = new Animation<>(0.10f, indTmp[2]);
         indAnimMeh = new Animation<>(0.10f, indTmp[3]);
-        indAnimBad = new Animation<>(0.10f, indTmp[4]);
         indAnimMiss = new Animation<>(0.10f, indTmp[5]);
 
         p1CurrentIndAnim = indAnimPerfect;
@@ -327,10 +327,6 @@ public class GameScreen implements Screen {
                             points = 50;
                             hpChange = 2f;
                             break;
-                        case AMAZING:
-                            points = 40;
-                            hpChange = 1.5f;
-                            break;
                         case GOOD:
                             points = 30;
                             hpChange = 1f;
@@ -339,18 +335,14 @@ public class GameScreen implements Screen {
                             points = 10;
                             hpChange = 0.5f;
                             break;
-                        case BAD:
-                            points = 0;
-                            hpChange = 0f;
-                            break;
                         default:
                             break;
                     }
                     if (isP1) {
+                        p1Stats.recordHit(grade);
                         p1Score += points;
+                        p1Stats.score = p1Score;
                         health += hpChange;
-                        if (grade == HitGrade.BAD)
-                            p1MissTimer = 0.3f;
                         if (grade == HitGrade.PERFECT) {
                             p1PerfectStreak++;
                             if (p1PerfectStreak == 10) {
@@ -374,17 +366,11 @@ public class GameScreen implements Screen {
                             case PERFECT:
                                 p1CurrentIndAnim = indAnimPerfect;
                                 break;
-                            case AMAZING:
-                                p1CurrentIndAnim = indAnimAmazing;
-                                break;
                             case GOOD:
                                 p1CurrentIndAnim = indAnimGood;
                                 break;
                             case MEH:
                                 p1CurrentIndAnim = indAnimMeh;
-                                break;
-                            case BAD:
-                                p1CurrentIndAnim = indAnimBad;
                                 break;
                             case MISS:
                                 p1CurrentIndAnim = indAnimMiss;
@@ -397,10 +383,10 @@ public class GameScreen implements Screen {
                         p1HitGradeImage.setVisible(true);
                         p1LabelTimer = 1.0f;
                     } else {
+                        p2Stats.recordHit(grade);
                         p2Score += points;
+                        p2Stats.score = p2Score;
                         health -= hpChange;
-                        if (grade == HitGrade.BAD)
-                            p2MissTimer = 0.3f;
                         if (grade == HitGrade.PERFECT) {
                             p2PerfectStreak++;
                             if (p2PerfectStreak == 10) {
@@ -424,17 +410,11 @@ public class GameScreen implements Screen {
                             case PERFECT:
                                 p2CurrentIndAnim = indAnimPerfect;
                                 break;
-                            case AMAZING:
-                                p2CurrentIndAnim = indAnimAmazing;
-                                break;
                             case GOOD:
                                 p2CurrentIndAnim = indAnimGood;
                                 break;
                             case MEH:
                                 p2CurrentIndAnim = indAnimMeh;
-                                break;
-                            case BAD:
-                                p2CurrentIndAnim = indAnimBad;
                                 break;
                             case MISS:
                                 p2CurrentIndAnim = indAnimMiss;
@@ -494,6 +474,7 @@ public class GameScreen implements Screen {
             if (HitDetector.hasMissed(note.targetTimeMs, currentSongTimeMs) && !note.isBeingHeld) {
                 iterator.remove();
                 if (isP1) {
+                    p1Stats.recordMiss();
                     health -= 2f;
                     p1MissTimer = 0.3f;
                     p1CurrentIndAnim = indAnimMiss;
@@ -503,6 +484,7 @@ public class GameScreen implements Screen {
                     p1PerfectStreak = 0;
                     p1StreakImage.setVisible(false);
                 } else {
+                    p2Stats.recordMiss();
                     health += 2f;
                     p2MissTimer = 0.3f;
                     p2CurrentIndAnim = indAnimMiss;
@@ -540,6 +522,7 @@ public class GameScreen implements Screen {
                 if (!isPressed) {
                     iterator.remove();
                     if (isP1) {
+                        p1Stats.recordMiss();
                         health -= 2f;
                         p1MissTimer = 0.3f;
                         p1CurrentIndAnim = indAnimMiss;
@@ -549,6 +532,7 @@ public class GameScreen implements Screen {
                         p1PerfectStreak = 0;
                         p1StreakImage.setVisible(false);
                     } else {
+                        p2Stats.recordMiss();
                         health += 2f;
                         p2MissTimer = 0.3f;
                         p2CurrentIndAnim = indAnimMiss;
@@ -742,7 +726,7 @@ public class GameScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(new ResultsScreen(game));
+            game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
             dispose();
             return;
         }
@@ -764,7 +748,7 @@ public class GameScreen implements Screen {
         }
 
         if (isFinished) {
-            game.setScreen(new ResultsScreen(game));
+            game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
             dispose();
             return;
         }

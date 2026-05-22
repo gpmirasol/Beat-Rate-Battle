@@ -25,8 +25,13 @@ public class ResultsScreen implements Screen {
     private Stage stage;
     private Skin skin;
 
-    public ResultsScreen(Game game) {
+    private io.github.MAC.mp125.PlayerStats p1Stats;
+    private io.github.MAC.mp125.PlayerStats p2Stats;
+
+    public ResultsScreen(Game game, io.github.MAC.mp125.PlayerStats p1Stats, io.github.MAC.mp125.PlayerStats p2Stats) {
         this.game = game;
+        this.p1Stats = p1Stats != null ? p1Stats : new io.github.MAC.mp125.PlayerStats();
+        this.p2Stats = p2Stats != null ? p2Stats : new io.github.MAC.mp125.PlayerStats();
     }
 
     @Override
@@ -52,14 +57,14 @@ public class ResultsScreen implements Screen {
 
         Table statsTable = new Table();
 
-        statsTable.add(makeRow("TOTAL NOTES", "0", "0", style)).row();
-        statsTable.add(makeRow("MAX COMBO", "0", "0", style)).row();
-        statsTable.add(makeRow("PERFECT", "0", "0", style)).row();
-        statsTable.add(makeRow("GOOD", "0", "0", style)).row();
-        statsTable.add(makeRow("MEH", "0", "0", style)).row();
-        statsTable.add(makeRow("MISS", "0", "0", style)).row();
+        statsTable.add(makeRow("TOTAL NOTES", String.valueOf(p1Stats.totalNotes), String.valueOf(p2Stats.totalNotes), style)).row();
+        statsTable.add(makeRow("MAX COMBO", String.valueOf(p1Stats.maxCombo), String.valueOf(p2Stats.maxCombo), style)).row();
+        statsTable.add(makeRow("PERFECT", String.valueOf(p1Stats.perfects), String.valueOf(p2Stats.perfects), style)).row();
+        statsTable.add(makeRow("GOOD", String.valueOf(p1Stats.goods), String.valueOf(p2Stats.goods), style)).row();
+        statsTable.add(makeRow("MEH", String.valueOf(p1Stats.mehs), String.valueOf(p2Stats.mehs), style)).row();
+        statsTable.add(makeRow("MISS", String.valueOf(p1Stats.misses), String.valueOf(p2Stats.misses), style)).row();
 
-        statsTable.add(makeScoreRow("SCORE", "0000", "0000", style));
+        statsTable.add(makeScoreRow("SCORE", String.valueOf(p1Stats.score), String.valueOf(p2Stats.score), style));
 
         // =========================
         // ROOT LAYOUT

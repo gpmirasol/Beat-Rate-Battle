@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
@@ -66,6 +67,8 @@ public class GameScreen implements Screen {
     private float p2LabelTimer = 0f;
     private Image p1HitGradeImage, p2HitGradeImage;
     private Animation<TextureRegion> indAnimPerfect, indAnimAmazing, indAnimGood, indAnimMeh, indAnimBad, indAnimMiss;
+    private Animation<TextureRegion> p1IndAnimPerfect, p1IndAnimAmazing, p1IndAnimGood, p1IndAnimMeh, p1IndAnimBad, p1IndAnimMiss;
+    private Animation<TextureRegion> p2IndAnimPerfect, p2IndAnimAmazing, p2IndAnimGood, p2IndAnimMeh, p2IndAnimBad, p2IndAnimMiss;
     private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
     private float p1IndStateTime = 0f, p2IndStateTime = 0f;
     private Animation<TextureRegion> p1AnimIdle;

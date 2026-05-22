@@ -52,13 +52,15 @@ public class GameScreen implements Screen {
     // Animation fields
     private static final int FRAME_COLS = 3, FRAME_ROWS = 6; // Todo: Adjust based on sprite sheet Update: Done
     private static final int SPRITE_SIZE = 682;
-    private Animation<TextureRegion> p1AnimW, p1AnimA, p1AnimS, p1AnimD;
-    private Animation<TextureRegion> p2AnimUp, p2AnimLeft, p2AnimDown, p2AnimRight;
+    private Animation<TextureRegion> p1AnimW, p1AnimA, p1AnimS, p1AnimD, p1AnimMiss;
+    private Animation<TextureRegion> p2AnimUp, p2AnimLeft, p2AnimDown, p2AnimRight, p2AnimMiss;
     private Animation<TextureRegion> p1CurrentAnim, p2CurrentAnim;
     private Texture p1SpriteSheet;
     private Texture p2SpriteSheet;
     private float p1StateTime = 0f;
     private float p2StateTime = 0f;
+    private float p1MissTimer = 0f;
+    private float p2MissTimer = 0f;
     private Animation<TextureRegion> p1AnimIdle;
     private TextureRegion p2IdleFrame;
     private Image p1Sprite, p2Sprite;
@@ -169,14 +171,12 @@ public class GameScreen implements Screen {
             }
         }
 
-        // Todo: Assign animations based on rows (each row = 3 frames)
-        // Todo: Row 0: IDLE, Row 1: Up(W), Row 2: Left(A), Row 3: Down(S), Row 4:
-        // Right(D), Row 5: Miss
         p1AnimIdle = new Animation<>(0.10f, p1Tmp[0]);
         p1AnimW = new Animation<>(0.10f, p1Tmp[1]);
         p1AnimA = new Animation<>(0.10f, p1Tmp[2]);
         p1AnimS = new Animation<>(0.10f, p1Tmp[3]);
         p1AnimD = new Animation<>(0.10f, p1Tmp[4]);
+        p1AnimMiss = new Animation<>(0.10f, p1Tmp[5]);
         p1CurrentAnim = p1AnimIdle;
 
         p2SpriteSheet = new Texture(Gdx.files.internal("kooacharsel.png"));
@@ -194,6 +194,7 @@ public class GameScreen implements Screen {
         p2AnimLeft = new Animation<>(0.15f, p2Frames[1], p2Frames[2]);
         p2AnimDown = new Animation<>(0.15f, p2Frames[2], p2Frames[3]);
         p2AnimRight = new Animation<>(0.15f, p2Frames[3], p2Frames[4]);
+        p2AnimMiss = new Animation<>(0.10f, p2Tmp[5]);
         p2CurrentAnim = p2AnimUp;
         p2IdleFrame = p2Frames[0];
 
@@ -281,11 +282,15 @@ public class GameScreen implements Screen {
                     if (isP1) {
                         p1Score += points;
                         health += hpChange;
+                        if (grade == HitGrade.BAD)
+                            p1MissTimer = 0.3f;
                     } else {
                         p2Score += points;
                         health -= hpChange;
+                        if (grade == HitGrade.BAD)
+                            p2MissTimer = 0.3f;
                     }
-                    return; // Hit processed, don't hit multiple notes at once
+                    return;
                 }
             }
         }
@@ -297,10 +302,13 @@ public class GameScreen implements Screen {
             GameNote note = iterator.next();
             if (HitDetector.hasMissed(note.targetTimeMs, currentSongTimeMs)) {
                 iterator.remove();
-                if (isP1)
-                    health -= 2f; // P1 misses
-                else
-                    health += 2f; // P2 misses
+                if (isP1) {
+                    health -= 2f;
+                    p1MissTimer = 0.3f;
+                } else {
+                    health += 2f;
+                    p2MissTimer = 0.3f;
+                }
                 continue;
             }
 
@@ -398,6 +406,12 @@ public class GameScreen implements Screen {
             p1Moving = true;
         }
 
+        if (p1MissTimer > 0) {
+            p1MissTimer -= delta;
+            p1CurrentAnim = p1AnimMiss;
+            p1Moving = true;
+        }
+
         if (!p1Moving) {
             if (p1CurrentAnim != p1AnimIdle) {
                 p1CurrentAnim = p1AnimIdle;
@@ -419,6 +433,12 @@ public class GameScreen implements Screen {
             p2Moving = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             p2CurrentAnim = p2AnimRight;
+            p2Moving = true;
+        }
+
+        if (p2MissTimer > 0) {
+            p2MissTimer -= delta;
+            p2CurrentAnim = p2AnimMiss;
             p2Moving = true;
         }
 
@@ -463,12 +483,18 @@ public class GameScreen implements Screen {
 
         // Draw Notes and Receptors over the stage
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        // Draw Receptors (Hollow)
-        float p1StartX = Gdx.graphics.getWidth() * 0.1f;
-        float p2StartX = Gdx.graphics.getWidth() * 0.7f;
+        // Dynamically align hitboxes to the actual UI buttons
+        com.badlogic.gdx.math.Vector2 p1Pos = aBtn.localToStageCoordinates(new com.badlogic.gdx.math.Vector2(0, 0));
+        com.badlogic.gdx.math.Vector2 p1NextPos = sBtn.localToStageCoordinates(new com.badlogic.gdx.math.Vector2(0, 0));
+        com.badlogic.gdx.math.Vector2 p2Pos = leftBtn.localToStageCoordinates(new com.badlogic.gdx.math.Vector2(0, 0));
 
-        // Adjust receptor height dynamically based on screen size
-        receptorY = Gdx.graphics.getHeight() - 100f;
+        float p1StartX = p1Pos.x;
+        float p2StartX = p2Pos.x;
+        receptorY = p1Pos.y;
+
+        // Calculate lane width based on the distance between the first two buttons
+        laneWidth = p1NextPos.x - p1Pos.x;
+        noteSize = aBtn.getWidth();
 
         shapeRenderer.setColor(Color.WHITE);
         for (int i = 0; i < 4; i++) {

@@ -51,14 +51,13 @@ public class GameScreen implements Screen {
     private String songName;
 
     // Animation fields
-    private static final int FRAME_COLS = 3, FRAME_ROWS = 6;
+    private static final int FRAME_COLS = 3, FRAME_ROWS = 6; // Todo: Adjust based on sprite sheet Update: Done
     private static final int SPRITE_SIZE = 682;
     private Animation<TextureRegion> p1AnimW, p1AnimA, p1AnimS, p1AnimD, p1AnimMiss;
     private Animation<TextureRegion> p2AnimUp, p2AnimLeft, p2AnimDown, p2AnimRight, p2AnimMiss;
     private Animation<TextureRegion> p1CurrentAnim, p2CurrentAnim;
     private Texture p1SpriteSheet;
     private Texture p2SpriteSheet;
-    private Texture indicatorSpriteSheet;
     private float p1StateTime = 0f;
     private float p2StateTime = 0f;
     private float p1MissTimer = 0f;
@@ -78,12 +77,8 @@ public class GameScreen implements Screen {
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
-    private Image p1StreakImage, p2StreakImage;
-    private TextureRegion[] counterFrames;
     private int p1Score = 0;
     private int p2Score = 0;
-    private int p1PerfectStreak = 0;
-    private int p2PerfectStreak = 0;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -179,14 +174,6 @@ public class GameScreen implements Screen {
         p2HitGradeImage = new Image();
         middleTable.add(p1HitGradeImage).padRight(20).padTop(20).width(100).height(100);
         middleTable.add(p2HitGradeImage).padLeft(20).padTop(20).width(100).height(100);
-
-        middleTable.row();
-        p1StreakImage = new Image();
-        p2StreakImage = new Image();
-        p1StreakImage.setVisible(false);
-        p2StreakImage.setVisible(false);
-        middleTable.add(p1StreakImage).padRight(20).padTop(10).width(80).height(40);
-        middleTable.add(p2StreakImage).padLeft(20).padTop(10).width(80).height(40);
 
         rootTable.add(middleTable).expand().center().top();
 
@@ -450,21 +437,17 @@ public class GameScreen implements Screen {
                 if (isP1) {
                     health -= 2f;
                     p1MissTimer = 0.3f;
-                    p1CurrentIndAnim = indAnimMiss;
+                    p1CurrentIndAnim = p1IndAnimMiss;
                     p1IndStateTime = 0f;
                     p1HitGradeImage.setVisible(true);
                     p1LabelTimer = 1.0f;
-                    p1PerfectStreak = 0;
-                    p1StreakImage.setVisible(false);
                 } else {
                     health += 2f;
                     p2MissTimer = 0.3f;
-                    p2CurrentIndAnim = indAnimMiss;
+                    p2CurrentIndAnim = p2IndAnimMiss;
                     p2IndStateTime = 0f;
                     p2HitGradeImage.setVisible(true);
                     p2LabelTimer = 1.0f;
-                    p2PerfectStreak = 0;
-                    p2StreakImage.setVisible(false);
                 }
                 continue;
             }

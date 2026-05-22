@@ -67,8 +67,10 @@ public class GameScreen implements Screen {
     private float p2LabelTimer = 0f;
     private Image p1HitGradeImage, p2HitGradeImage;
     private Animation<TextureRegion> indAnimPerfect, indAnimAmazing, indAnimGood, indAnimMeh, indAnimBad, indAnimMiss;
-    private Animation<TextureRegion> p1IndAnimPerfect, p1IndAnimAmazing, p1IndAnimGood, p1IndAnimMeh, p1IndAnimBad, p1IndAnimMiss;
-    private Animation<TextureRegion> p2IndAnimPerfect, p2IndAnimAmazing, p2IndAnimGood, p2IndAnimMeh, p2IndAnimBad, p2IndAnimMiss;
+    private Animation<TextureRegion> p1IndAnimPerfect, p1IndAnimAmazing, p1IndAnimGood, p1IndAnimMeh, p1IndAnimBad,
+            p1IndAnimMiss;
+    private Animation<TextureRegion> p2IndAnimPerfect, p2IndAnimAmazing, p2IndAnimGood, p2IndAnimMeh, p2IndAnimBad,
+            p2IndAnimMiss;
     private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
     private float p1IndStateTime = 0f, p2IndStateTime = 0f;
     private Animation<TextureRegion> p1AnimIdle;
@@ -168,11 +170,11 @@ public class GameScreen implements Screen {
 
         healthBar = new ProgressBar(0, 100, 1, false, skin);
         healthBar.setValue(health);
-        
+
         Table middleTable = new Table();
         middleTable.add(healthBar).colspan(2).center().top().padTop(70).width(300);
         middleTable.row();
-        
+
         p1HitGradeImage = new Image();
         p2HitGradeImage = new Image();
         middleTable.add(p1HitGradeImage).padRight(20).padTop(20).width(100).height(100);
@@ -246,14 +248,14 @@ public class GameScreen implements Screen {
         TextureRegion[][] indTmp = TextureRegion.split(indicatorSpriteSheet,
                 indicatorSpriteSheet.getWidth() / 3,
                 indicatorSpriteSheet.getHeight() / 6);
-        
+
         indAnimPerfect = new Animation<>(0.10f, indTmp[0]);
         indAnimAmazing = new Animation<>(0.10f, indTmp[1]);
         indAnimGood = new Animation<>(0.10f, indTmp[2]);
         indAnimMeh = new Animation<>(0.10f, indTmp[3]);
         indAnimBad = new Animation<>(0.10f, indTmp[4]);
         indAnimMiss = new Animation<>(0.10f, indTmp[5]);
-        
+
         p1CurrentIndAnim = indAnimPerfect;
         p2CurrentIndAnim = indAnimPerfect;
 
@@ -288,8 +290,8 @@ public class GameScreen implements Screen {
             backgroundMusic.play();
         }
 
-        p1Notes = smParser.parseChart(songName + ".sm", 1);
-        p2Notes = smParser.parseChart(songName + ".sm", 2);
+        p1Notes = smParser.parseChart(songName + "_easy.sm", 1);
+        p2Notes = smParser.parseChart(songName + "_easy.sm", 2);
 
         System.out.println("Game Screen Started");
     }
@@ -343,10 +345,12 @@ public class GameScreen implements Screen {
                     if (isP1) {
                         p1Score += points;
                         health += hpChange;
-                        if (grade == HitGrade.BAD) p1MissTimer = 0.3f;
+                        if (grade == HitGrade.BAD)
+                            p1MissTimer = 0.3f;
                         if (grade == HitGrade.PERFECT) {
                             p1PerfectStreak++;
-                            if (p1PerfectStreak > 10) p1PerfectStreak = 1;
+                            if (p1PerfectStreak > 10)
+                                p1PerfectStreak = 1;
                         } else {
                             p1PerfectStreak = 0;
                         }
@@ -359,13 +363,27 @@ public class GameScreen implements Screen {
                         }
 
                         switch (grade) {
-                            case PERFECT: p1CurrentIndAnim = indAnimPerfect; break;
-                            case AMAZING: p1CurrentIndAnim = indAnimAmazing; break;
-                            case GOOD: p1CurrentIndAnim = indAnimGood; break;
-                            case MEH: p1CurrentIndAnim = indAnimMeh; break;
-                            case BAD: p1CurrentIndAnim = indAnimBad; break;
-                            case MISS: p1CurrentIndAnim = indAnimMiss; break;
-                            default: p1CurrentIndAnim = indAnimPerfect; break;
+                            case PERFECT:
+                                p1CurrentIndAnim = indAnimPerfect;
+                                break;
+                            case AMAZING:
+                                p1CurrentIndAnim = indAnimAmazing;
+                                break;
+                            case GOOD:
+                                p1CurrentIndAnim = indAnimGood;
+                                break;
+                            case MEH:
+                                p1CurrentIndAnim = indAnimMeh;
+                                break;
+                            case BAD:
+                                p1CurrentIndAnim = indAnimBad;
+                                break;
+                            case MISS:
+                                p1CurrentIndAnim = indAnimMiss;
+                                break;
+                            default:
+                                p1CurrentIndAnim = indAnimPerfect;
+                                break;
                         }
                         p1IndStateTime = 0f;
                         p1HitGradeImage.setVisible(true);
@@ -373,10 +391,12 @@ public class GameScreen implements Screen {
                     } else {
                         p2Score += points;
                         health -= hpChange;
-                        if (grade == HitGrade.BAD) p2MissTimer = 0.3f;
+                        if (grade == HitGrade.BAD)
+                            p2MissTimer = 0.3f;
                         if (grade == HitGrade.PERFECT) {
                             p2PerfectStreak++;
-                            if (p2PerfectStreak > 10) p2PerfectStreak = 1;
+                            if (p2PerfectStreak > 10)
+                                p2PerfectStreak = 1;
                         } else {
                             p2PerfectStreak = 0;
                         }
@@ -389,13 +409,27 @@ public class GameScreen implements Screen {
                         }
 
                         switch (grade) {
-                            case PERFECT: p2CurrentIndAnim = indAnimPerfect; break;
-                            case AMAZING: p2CurrentIndAnim = indAnimAmazing; break;
-                            case GOOD: p2CurrentIndAnim = indAnimGood; break;
-                            case MEH: p2CurrentIndAnim = indAnimMeh; break;
-                            case BAD: p2CurrentIndAnim = indAnimBad; break;
-                            case MISS: p2CurrentIndAnim = indAnimMiss; break;
-                            default: p2CurrentIndAnim = indAnimPerfect; break;
+                            case PERFECT:
+                                p2CurrentIndAnim = indAnimPerfect;
+                                break;
+                            case AMAZING:
+                                p2CurrentIndAnim = indAnimAmazing;
+                                break;
+                            case GOOD:
+                                p2CurrentIndAnim = indAnimGood;
+                                break;
+                            case MEH:
+                                p2CurrentIndAnim = indAnimMeh;
+                                break;
+                            case BAD:
+                                p2CurrentIndAnim = indAnimBad;
+                                break;
+                            case MISS:
+                                p2CurrentIndAnim = indAnimMiss;
+                                break;
+                            default:
+                                p2CurrentIndAnim = indAnimPerfect;
+                                break;
                         }
                         p2IndStateTime = 0f;
                         p2HitGradeImage.setVisible(true);
@@ -577,19 +611,21 @@ public class GameScreen implements Screen {
             p1LabelTimer -= delta;
             p1IndStateTime += delta;
             p1HitGradeImage.setDrawable(new TextureRegionDrawable(p1CurrentIndAnim.getKeyFrame(p1IndStateTime, true)));
-            if (p1LabelTimer <= 0) p1HitGradeImage.setVisible(false);
+            if (p1LabelTimer <= 0)
+                p1HitGradeImage.setVisible(false);
         }
         if (p2LabelTimer > 0) {
             p2LabelTimer -= delta;
             p2IndStateTime += delta;
             p2HitGradeImage.setDrawable(new TextureRegionDrawable(p2CurrentIndAnim.getKeyFrame(p2IndStateTime, true)));
-            if (p2LabelTimer <= 0) p2HitGradeImage.setVisible(false);
+            if (p2LabelTimer <= 0)
+                p2HitGradeImage.setVisible(false);
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new ResultsScreen(game));
-            dispose(); // Free up resources when leaving the screen
-            return; // Prevent further rendering with disposed resources
+            dispose();
+            return;
         }
 
         // Check if the song/level has finished

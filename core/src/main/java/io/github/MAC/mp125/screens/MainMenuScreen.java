@@ -9,10 +9,12 @@ import com.badlogic.gdx.graphics.Texture;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton; /** to be used later */
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -25,10 +27,10 @@ public class MainMenuScreen implements Screen {
     private Table table;
     private Image background;
 
-    private TextButton playButton;
-    /** TextButton change to ImageButton later */
-    private TextButton howToPlayButton;
-    /** TextButton change to ImageButton later */
+    private ImageButton playButton;
+    private Texture playTexture;
+    private ImageButton howToPlayButton;
+    private Texture howToPlayTexture;
 
     private Skin skin;
     private Game game;
@@ -56,11 +58,10 @@ public class MainMenuScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        playButton = new TextButton("Play", skin); /** change to "playButton = new ImageButton(skin);" later */
-        howToPlayButton = new TextButton("How to Play", skin); /**
-                                                                * change to "howToPlayButton = new ImageButton(skin);"
-                                                                * later
-                                                                */
+        playTexture = new Texture(Gdx.files.internal("buttonplay.png"));
+        playButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(playTexture)));
+        howToPlayTexture = new Texture(Gdx.files.internal("buttonhowtoplay.png"));
+        howToPlayButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(howToPlayTexture)));
 
         table.add(playButton).width(250).height(80).pad(10);
         table.row();
@@ -113,5 +114,8 @@ public class MainMenuScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        if (playTexture != null) {
+            playTexture.dispose();
+        }
     }
 }

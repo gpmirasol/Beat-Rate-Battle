@@ -31,6 +31,7 @@ import io.github.MAC.mp125.notes.HitDetector.HitGrade;
 public class GameScreen implements Screen {
     private Game game;
     private Stage stage;
+    private Stage overlayStage;
     private Skin skin;
     private Texture bgTexture;
     private ProgressBar healthBar;
@@ -88,7 +89,9 @@ public class GameScreen implements Screen {
     private long totalSongDurationMs = 0;
     private boolean isGameOver = false;
     private float gameOverTimer = 0f;
-    private Label p1EndLabel, p2EndLabel;
+    private Image p1EndLabel, p2EndLabel;
+    private Texture winMessage = new Texture(Gdx.files.internal("labelyouwin.png"));
+    private Texture loseMessage = new Texture(Gdx.files.internal("labelyoulose.png"));
 
     private Music countdownAudio;
     private boolean isCountingDown = false;
@@ -120,6 +123,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         stage = new Stage(new ScreenViewport());
+        overlayStage = new Stage(new ScreenViewport());
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         bgTexture = new Texture(Gdx.files.internal(bgName + "background.png"));
@@ -292,16 +296,18 @@ public class GameScreen implements Screen {
         rootTable.add().expand().center();
         rootTable.add(p2ScoreLabel).expand().center().top();
 
-        rootTable.row();
-        p1EndLabel = new Label("", skin);
-        p2EndLabel = new Label("", skin);
+        // Create end game overlay layout
+        Table overlayTable = new Table();
+        overlayTable.setFillParent(true);
+        overlayStage.addActor(overlayTable);
+
+        p1EndLabel = new Image(winMessage);
+        p2EndLabel = new Image(winMessage);
         p1EndLabel.setVisible(false);
         p2EndLabel.setVisible(false);
-        p1EndLabel.setFontScale(2f);
-        p2EndLabel.setFontScale(2f);
-        rootTable.add(p1EndLabel).expand().center().top();
-        rootTable.add().expand().center();
-        rootTable.add(p2EndLabel).expand().center().top();
+        overlayTable.add(p1EndLabel).expand().center().size(300, 100);
+        overlayTable.add().expand().center();
+        overlayTable.add(p2EndLabel).expand().center().size(300, 100);
 
         rootTable.row();
         progressBar = new ProgressBar(0f, 100f, 0.01f, false, skin);
@@ -372,15 +378,15 @@ public class GameScreen implements Screen {
                     switch (grade) {
                         case PERFECT:
                             points = 50;
-                            hpChange = 1.0f;
+                            hpChange = 0.1f;
                             break;
                         case GOOD:
                             points = 30;
-                            hpChange = 0.5f;
+                            hpChange = 0.05f;
                             break;
                         case MEH:
                             points = 10;
-                            hpChange = 0.25f;
+                            hpChange = 0.025f;
                             break;
                         default:
                             break;
@@ -396,7 +402,7 @@ public class GameScreen implements Screen {
                             p1PerfectStreak++;
                             if (p1PerfectStreak == 10) {
                                 setOpponentChart(false, true);
-                                p2HardModeTimer = 5.0f;
+                                p2HardModeTimer = 3.0f;
                             }
                             if (p1PerfectStreak > 10)
                                 p1PerfectStreak = 1;
@@ -839,14 +845,14 @@ public class GameScreen implements Screen {
                     backgroundMusic.stop();
                 }
                 if (health >= 100f) {
-                    p1EndLabel.setText("YOU WIN");
+                    p1EndLabel.setDrawable(new TextureRegionDrawable(new TextureRegion(winMessage)));
                     p1EndLabel.setColor(Color.GREEN);
-                    p2EndLabel.setText("YOU LOSE");
+                    p2EndLabel.setDrawable(new TextureRegionDrawable(new TextureRegion(loseMessage)));
                     p2EndLabel.setColor(Color.RED);
                 } else {
-                    p1EndLabel.setText("YOU LOSE");
+                    p1EndLabel.setDrawable(new TextureRegionDrawable(new TextureRegion(loseMessage)));
                     p1EndLabel.setColor(Color.RED);
-                    p2EndLabel.setText("YOU WIN");
+                    p2EndLabel.setDrawable(new TextureRegionDrawable(new TextureRegion(winMessage)));
                     p2EndLabel.setColor(Color.GREEN);
                 }
                 p1EndLabel.setVisible(true);
@@ -905,6 +911,9 @@ public class GameScreen implements Screen {
         updateAndDrawNotes(p1Notes, p1StartX, true);
         updateAndDrawNotes(p2Notes, p2StartX, false);
         stage.getBatch().end();
+
+        overlayStage.act(delta);
+        overlayStage.draw();
     }
 
     @Override
@@ -912,6 +921,9 @@ public class GameScreen implements Screen {
         if (stage == null)
             return;
         stage.getViewport().update(width, height, true);
+        if (overlayStage != null) {
+            overlayStage.getViewport().update(width, height, true);
+        }
     }
 
     @Override
@@ -936,6 +948,9 @@ public class GameScreen implements Screen {
     public void dispose() {
         if (stage != null) {
             stage.dispose();
+        }
+        if (overlayStage != null) {
+            overlayStage.dispose();
         }
         if (skin != null) {
             skin.dispose();

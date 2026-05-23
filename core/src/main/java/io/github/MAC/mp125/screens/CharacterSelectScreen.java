@@ -90,7 +90,7 @@ public class CharacterSelectScreen implements Screen {
         p2Label.setAlignment(Align.center);
 
         // READY LABEL
-        battleBannerTexture =  new Texture(Gdx.files.internal("buttonpresstocontinue.png"));
+        battleBannerTexture = new Texture(Gdx.files.internal("buttonpresstocontinue.png"));
         Image battleBanner = new Image(battleBannerTexture);
 
         // LAYOUT

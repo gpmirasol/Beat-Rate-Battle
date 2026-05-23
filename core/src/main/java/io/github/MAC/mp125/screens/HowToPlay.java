@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -20,8 +21,10 @@ public class HowToPlay implements Screen {
     private Skin skin;
 
     private Image image;
-    private TextButton nextButton;
-    private TextButton backButton;
+    private Texture nextTexture;
+    private Texture backTexture;
+    private Image nextButton;
+    private Image backButton;
 
     private int page = 0;
 
@@ -49,10 +52,15 @@ public class HowToPlay implements Screen {
         stage.addActor(image);
 
         // BUTTONS
-        nextButton = new TextButton("Next", skin);
-        backButton = new TextButton("Back", skin);
+        nextTexture = new Texture(Gdx.files.internal("buttonnext.png"));
+        backTexture = new Texture(Gdx.files.internal("buttonback.png"));
+        nextButton = new Image(nextTexture);
+        backButton = new Image(backTexture);
 
-        nextButton.setPosition(Gdx.graphics.getWidth() - 120, 20);
+        nextButton.setSize(120, 50);
+        backButton.setSize(120, 50);
+
+        nextButton.setPosition(Gdx.graphics.getWidth() - nextButton.getWidth() - 20, 20);
         backButton.setPosition(20, 20);
 
         stage.addActor(nextButton);
@@ -103,6 +111,12 @@ public class HowToPlay implements Screen {
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+        if (nextButton != null) {
+            nextButton.setPosition(width - nextButton.getWidth() - 20, 20);
+        }
+        if (backButton != null) {
+            backButton.setPosition(20, 20);
+        }
     }
 
     @Override
@@ -121,5 +135,11 @@ public class HowToPlay implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        if (nextTexture != null) {
+            nextTexture.dispose();
+        }
+        if (backTexture != null) {
+            backTexture.dispose();
+        }
     }
 }

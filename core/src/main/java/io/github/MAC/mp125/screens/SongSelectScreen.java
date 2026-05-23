@@ -86,6 +86,7 @@ public class SongSelectScreen implements Screen {
         // root layout
         rootTable = new Table();
         rootTable.setFillParent(true);
+        rootTable.top();
         stage.addActor(rootTable);
 
         // song buttons
@@ -106,21 +107,18 @@ public class SongSelectScreen implements Screen {
         songBar.add(song2Button).width(180).height(70).pad(10);
         songBar.add(song3Button).width(180).height(70).pad(10);
 
-        rootTable.add(songBar).top().padTop(20);
-        rootTable.row();
+        rootTable.add(songBar).padTop(20);
 
-        // center preview text (fallback)
+        // center banner layout
+        Table bannerTable = new Table();
+        bannerTable.setFillParent(true);
+        bannerTable.center();
+        stage.addActor(bannerTable);
 
         startBannerTexture = new Texture(Gdx.files.internal("buttonpresstocontinue.png"));
         startBanner = new Image(startBannerTexture);
 
-        rootTable.row();
-
-        rootTable.add(startBanner)
-                .colspan(1)
-                .size(300, 100)
-                .center()
-                .padBottom(40);
+        bannerTable.add(startBanner).size(300, 100);
 
         System.out.println("Song Select Screen");
     }

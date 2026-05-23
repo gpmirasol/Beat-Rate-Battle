@@ -159,6 +159,12 @@ public class CharacterSelectScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            game.setScreen(new MainMenuScreen(game));
+            dispose();
+            return;
+        }
+
         // P1 Image Carousel
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             p1SpriteIndex--;

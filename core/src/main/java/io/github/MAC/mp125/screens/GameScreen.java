@@ -105,6 +105,12 @@ public class GameScreen implements Screen {
     private TextureRegionDrawable drawPressedLeft, drawPressedDown, drawPressedUp, drawPressedRight;
     private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
 
+    // Spritesheets
+    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "aleiancharsel.png",
+            "marisprite.png" };
+    String p1SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP1SpriteIndex];
+    String p2SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP2SpriteIndex];
+
     public GameScreen(Game game, String songName, String bgName) {
         this.game = game;
         this.songName = songName;
@@ -205,7 +211,7 @@ public class GameScreen implements Screen {
         // Placeholders for player sprites | TODO: @grace Change Image/s for Sprites
         rootTable.row();
         // Load Sprite Sheets
-        p1SpriteSheet = new Texture(Gdx.files.internal("meeraspritesheet.png"));
+        p1SpriteSheet = new Texture(Gdx.files.internal(p1SpriteChoice));
         TextureRegion[][] p1Tmp = TextureRegion.split(p1SpriteSheet, SPRITE_SIZE, SPRITE_SIZE);
         TextureRegion[] p1Frames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
@@ -223,7 +229,7 @@ public class GameScreen implements Screen {
         p1AnimMiss = new Animation<>(0.10f, p1Tmp[5]);
         p1CurrentAnim = p1AnimIdle;
 
-        p2SpriteSheet = new Texture(Gdx.files.internal("kooacharsel.png"));
+        p2SpriteSheet = new Texture(Gdx.files.internal(p2SpriteChoice));
         TextureRegion[][] p2Tmp = TextureRegion.split(p2SpriteSheet,
                 p2SpriteSheet.getWidth() / FRAME_COLS,
                 p2SpriteSheet.getHeight() / FRAME_ROWS);

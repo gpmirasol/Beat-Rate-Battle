@@ -86,6 +86,9 @@ public class GameScreen implements Screen {
     private io.github.MAC.mp125.PlayerStats p1Stats = new io.github.MAC.mp125.PlayerStats();
     private io.github.MAC.mp125.PlayerStats p2Stats = new io.github.MAC.mp125.PlayerStats();
     private long totalSongDurationMs = 0;
+    private boolean isGameOver = false;
+    private float gameOverTimer = 0f;
+    private Label p1EndLabel, p2EndLabel;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -277,6 +280,17 @@ public class GameScreen implements Screen {
         rootTable.add(p1ScoreLabel).expand().center().top();
         rootTable.add().expand().center();
         rootTable.add(p2ScoreLabel).expand().center().top();
+
+        rootTable.row();
+        p1EndLabel = new Label("", skin);
+        p2EndLabel = new Label("", skin);
+        p1EndLabel.setVisible(false);
+        p2EndLabel.setVisible(false);
+        p1EndLabel.setFontScale(2f);
+        p2EndLabel.setFontScale(2f);
+        rootTable.add(p1EndLabel).expand().center().top();
+        rootTable.add().expand().center();
+        rootTable.add(p2EndLabel).expand().center().top();
 
         rootTable.row();
         progressBar = new ProgressBar(0f, 100f, 0.01f, false, skin);
@@ -630,178 +644,209 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
-            // Synchronize note position using actual audio position
-            currentSongTimeMs = (long) (backgroundMusic.getPosition() * 1000);
-        } else {
-            currentSongTimeMs += (long) (delta * 1000);
-        }
-
-        if (p1HardModeTimer > 0) {
-            p1HardModeTimer -= delta;
-            if (p1HardModeTimer <= 0) {
-                p1HardModeTimer = 0f;
-                setOpponentChart(true, false);
-            }
-        }
-
-        if (p2HardModeTimer > 0) {
-            p2HardModeTimer -= delta;
-            if (p2HardModeTimer <= 0) {
-                p2HardModeTimer = 0f;
-                setOpponentChart(false, false);
-            }
-        }
-
-        // Update P1 Keys
-        boolean wPressed = updateButtonState(wBtn, drawUp, drawPressedUp, Input.Keys.W);
-        boolean aPressed = updateButtonState(aBtn, drawLeft, drawPressedLeft, Input.Keys.A);
-        boolean sPressed = updateButtonState(sBtn, drawDown, drawPressedDown, Input.Keys.S);
-        boolean dPressed = updateButtonState(dBtn, drawRight, drawPressedRight, Input.Keys.D);
-
-        if (aPressed)
-            processHitAttempt(p1Notes, 0, true);
-        if (sPressed)
-            processHitAttempt(p1Notes, 1, true);
-        if (wPressed)
-            processHitAttempt(p1Notes, 2, true);
-        if (dPressed)
-            processHitAttempt(p1Notes, 3, true);
-
-        // Update P2 Keys
-        boolean upPressed = updateButtonState(upBtn, drawUp, drawPressedUp, Input.Keys.UP);
-        boolean leftPressed = updateButtonState(leftBtn, drawLeft, drawPressedLeft, Input.Keys.LEFT);
-        boolean downPressed = updateButtonState(downBtn, drawDown, drawPressedDown, Input.Keys.DOWN);
-        boolean rightPressed = updateButtonState(rightBtn, drawRight, drawPressedRight, Input.Keys.RIGHT);
-
-        if (leftPressed)
-            processHitAttempt(p2Notes, 0, false);
-        if (downPressed)
-            processHitAttempt(p2Notes, 1, false);
-        if (upPressed)
-            processHitAttempt(p2Notes, 2, false);
-        if (rightPressed)
-            processHitAttempt(p2Notes, 3, false);
-
-        p1ScoreLabel.setText("Score: " + p1Score);
-        p2ScoreLabel.setText("Score: " + p2Score);
-
-        // Clamp health
-        if (health >= 100)
-            health = 100f;
-        if (health <= 0)
-            health = 0f;
-        healthBar.setValue(health);
-
-        if (totalSongDurationMs > 0) {
-            float progress = ((float) currentSongTimeMs / totalSongDurationMs) * 100f;
-            if (progress > 100f)
-                progress = 100f;
-            progressBar.setValue(progress);
-        }
-
-        // Apply animation frame corresponding to key
-        boolean p1Moving = false;
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            p1CurrentAnim = p1AnimW;
-            p1Moving = true;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            p1CurrentAnim = p1AnimA;
-            p1Moving = true;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            p1CurrentAnim = p1AnimS;
-            p1Moving = true;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            p1CurrentAnim = p1AnimD;
-            p1Moving = true;
-        }
-
-        if (p1MissTimer > 0) {
-            p1MissTimer -= delta;
-            p1CurrentAnim = p1AnimMiss;
-            p1Moving = true;
-        }
-
-        if (!p1Moving) {
-            if (p1CurrentAnim != p1AnimIdle) {
-                p1CurrentAnim = p1AnimIdle;
-                p1StateTime = 0f; // Reset only once when switching to idle
-            }
-        }
-        p1StateTime += delta;
-        p1Sprite.setDrawable(new TextureRegionDrawable(p1CurrentAnim.getKeyFrame(p1StateTime, true)));
-
-        boolean p2Moving = false;
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            p2CurrentAnim = p2AnimUp;
-            p2Moving = true;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            p2CurrentAnim = p2AnimLeft;
-            p2Moving = true;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            p2CurrentAnim = p2AnimDown;
-            p2Moving = true;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            p2CurrentAnim = p2AnimRight;
-            p2Moving = true;
-        }
-
-        if (p2MissTimer > 0) {
-            p2MissTimer -= delta;
-            p2CurrentAnim = p2AnimMiss;
-            p2Moving = true;
-        }
-
-        if (p2Moving) {
-            p2StateTime += delta;
-            p2Sprite.setDrawable(new TextureRegionDrawable(p2CurrentAnim.getKeyFrame(p2StateTime, true)));
-        } else {
-            p2StateTime = 0f;
-            p2Sprite.setDrawable(new TextureRegionDrawable(p2IdleFrame));
-        }
-
-        if (p1LabelTimer > 0) {
-            p1LabelTimer -= delta;
-            p1IndStateTime += delta;
-            p1HitGradeImage.setDrawable(new TextureRegionDrawable(p1CurrentIndAnim.getKeyFrame(p1IndStateTime, true)));
-            if (p1LabelTimer <= 0)
-                p1HitGradeImage.setVisible(false);
-        }
-        if (p2LabelTimer > 0) {
-            p2LabelTimer -= delta;
-            p2IndStateTime += delta;
-            p2HitGradeImage.setDrawable(new TextureRegionDrawable(p2CurrentIndAnim.getKeyFrame(p2IndStateTime, true)));
-            if (p2LabelTimer <= 0)
-                p2HitGradeImage.setVisible(false);
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
-            dispose();
-            return;
-        }
-
-        // Check if the song/level has finished
-        boolean isFinished = false;
-        if (backgroundMusic != null) {
-            // If music was playing and has now stopped (and we're past the first second to
-            // avoid early triggers)
-            if (!backgroundMusic.isPlaying() && currentSongTimeMs > 1000) {
-                isFinished = true;
+        if (isGameOver) {
+            gameOverTimer += delta;
+            if (gameOverTimer >= 3.0f) {
+                game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
+                dispose();
+                return;
             }
         } else {
-            // Fallback if no music file is present: check if all notes are cleared and at
-            // least 1 second has passed
-            if (p1Notes.isEmpty() && p2Notes.isEmpty() && currentSongTimeMs > 1000) {
-                isFinished = true;
+            if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+                // Synchronize note position using actual audio position
+                currentSongTimeMs = (long) (backgroundMusic.getPosition() * 1000);
+            } else {
+                currentSongTimeMs += (long) (delta * 1000);
             }
-        }
 
-        if (isFinished) {
-            game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
-            dispose();
-            return;
-        }
+            if (p1HardModeTimer > 0) {
+                p1HardModeTimer -= delta;
+                if (p1HardModeTimer <= 0) {
+                    p1HardModeTimer = 0f;
+                    setOpponentChart(true, false);
+                }
+            }
+
+            if (p2HardModeTimer > 0) {
+                p2HardModeTimer -= delta;
+                if (p2HardModeTimer <= 0) {
+                    p2HardModeTimer = 0f;
+                    setOpponentChart(false, false);
+                }
+            }
+
+            // Update P1 Keys
+            boolean wPressed = updateButtonState(wBtn, drawUp, drawPressedUp, Input.Keys.W);
+            boolean aPressed = updateButtonState(aBtn, drawLeft, drawPressedLeft, Input.Keys.A);
+            boolean sPressed = updateButtonState(sBtn, drawDown, drawPressedDown, Input.Keys.S);
+            boolean dPressed = updateButtonState(dBtn, drawRight, drawPressedRight, Input.Keys.D);
+
+            if (aPressed)
+                processHitAttempt(p1Notes, 0, true);
+            if (sPressed)
+                processHitAttempt(p1Notes, 1, true);
+            if (wPressed)
+                processHitAttempt(p1Notes, 2, true);
+            if (dPressed)
+                processHitAttempt(p1Notes, 3, true);
+
+            // Update P2 Keys
+            boolean upPressed = updateButtonState(upBtn, drawUp, drawPressedUp, Input.Keys.UP);
+            boolean leftPressed = updateButtonState(leftBtn, drawLeft, drawPressedLeft, Input.Keys.LEFT);
+            boolean downPressed = updateButtonState(downBtn, drawDown, drawPressedDown, Input.Keys.DOWN);
+            boolean rightPressed = updateButtonState(rightBtn, drawRight, drawPressedRight, Input.Keys.RIGHT);
+
+            if (leftPressed)
+                processHitAttempt(p2Notes, 0, false);
+            if (downPressed)
+                processHitAttempt(p2Notes, 1, false);
+            if (upPressed)
+                processHitAttempt(p2Notes, 2, false);
+            if (rightPressed)
+                processHitAttempt(p2Notes, 3, false);
+
+            p1ScoreLabel.setText("Score: " + p1Score);
+            p2ScoreLabel.setText("Score: " + p2Score);
+
+            // Clamp health
+            if (health >= 100)
+                health = 100f;
+            if (health <= 0)
+                health = 0f;
+            healthBar.setValue(health);
+
+            if (totalSongDurationMs > 0) {
+                float progress = ((float) currentSongTimeMs / totalSongDurationMs) * 100f;
+                if (progress > 100f)
+                    progress = 100f;
+                progressBar.setValue(progress);
+            }
+
+            // Apply animation frame corresponding to key
+            boolean p1Moving = false;
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                p1CurrentAnim = p1AnimW;
+                p1Moving = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                p1CurrentAnim = p1AnimA;
+                p1Moving = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                p1CurrentAnim = p1AnimS;
+                p1Moving = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                p1CurrentAnim = p1AnimD;
+                p1Moving = true;
+            }
+
+            if (p1MissTimer > 0) {
+                p1MissTimer -= delta;
+                p1CurrentAnim = p1AnimMiss;
+                p1Moving = true;
+            }
+
+            if (!p1Moving) {
+                if (p1CurrentAnim != p1AnimIdle) {
+                    p1CurrentAnim = p1AnimIdle;
+                    p1StateTime = 0f; // Reset only once when switching to idle
+                }
+            }
+            p1StateTime += delta;
+            p1Sprite.setDrawable(new TextureRegionDrawable(p1CurrentAnim.getKeyFrame(p1StateTime, true)));
+
+            boolean p2Moving = false;
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                p2CurrentAnim = p2AnimUp;
+                p2Moving = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                p2CurrentAnim = p2AnimLeft;
+                p2Moving = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                p2CurrentAnim = p2AnimDown;
+                p2Moving = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                p2CurrentAnim = p2AnimRight;
+                p2Moving = true;
+            }
+
+            if (p2MissTimer > 0) {
+                p2MissTimer -= delta;
+                p2CurrentAnim = p2AnimMiss;
+                p2Moving = true;
+            }
+
+            if (p2Moving) {
+                p2StateTime += delta;
+                p2Sprite.setDrawable(new TextureRegionDrawable(p2CurrentAnim.getKeyFrame(p2StateTime, true)));
+            } else {
+                p2StateTime = 0f;
+                p2Sprite.setDrawable(new TextureRegionDrawable(p2IdleFrame));
+            }
+
+            if (p1LabelTimer > 0) {
+                p1LabelTimer -= delta;
+                p1IndStateTime += delta;
+                p1HitGradeImage
+                        .setDrawable(new TextureRegionDrawable(p1CurrentIndAnim.getKeyFrame(p1IndStateTime, true)));
+                if (p1LabelTimer <= 0)
+                    p1HitGradeImage.setVisible(false);
+            }
+            if (p2LabelTimer > 0) {
+                p2LabelTimer -= delta;
+                p2IndStateTime += delta;
+                p2HitGradeImage
+                        .setDrawable(new TextureRegionDrawable(p2CurrentIndAnim.getKeyFrame(p2IndStateTime, true)));
+                if (p2LabelTimer <= 0)
+                    p2HitGradeImage.setVisible(false);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
+                dispose();
+                return;
+            }
+
+            if (health >= 100f || health <= 0f) {
+                isGameOver = true;
+                if (backgroundMusic != null) {
+                    backgroundMusic.stop();
+                }
+                if (health >= 100f) {
+                    p1EndLabel.setText("YOU WIN");
+                    p1EndLabel.setColor(Color.GREEN);
+                    p2EndLabel.setText("YOU LOSE");
+                    p2EndLabel.setColor(Color.RED);
+                } else {
+                    p1EndLabel.setText("YOU LOSE");
+                    p1EndLabel.setColor(Color.RED);
+                    p2EndLabel.setText("YOU WIN");
+                    p2EndLabel.setColor(Color.GREEN);
+                }
+                p1EndLabel.setVisible(true);
+                p2EndLabel.setVisible(true);
+            } else {
+                // Check if the song/level has finished
+                boolean isFinished = false;
+                if (backgroundMusic != null) {
+                    // If music was playing and has now stopped (and we're past the first second to
+                    // avoid early triggers)
+                    if (!backgroundMusic.isPlaying() && currentSongTimeMs > 1000) {
+                        isFinished = true;
+                    }
+                } else {
+                    // Fallback if no music file is present: check if all notes are cleared and at
+                    // least 1 second has passed
+                    if (p1Notes.isEmpty() && p2Notes.isEmpty() && currentSongTimeMs > 1000) {
+                        isFinished = true;
+                    }
+                }
+
+                if (isFinished) {
+                    game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
+                    dispose();
+                    return;
+                }
+            }
+        } // End of !isGameOver block
 
         stage.act(delta);
         stage.draw();

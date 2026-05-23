@@ -157,7 +157,7 @@ public class SongSelectScreen implements Screen {
                 previewMusic = null;
             }
             previewDelayTimer += delta;
-            if (previewDelayTimer >= 1.0f) {
+            if (previewDelayTimer >= 0.5f) {
                 String songName = songNames[selectedSongIndex];
                 if (Gdx.files.internal(songName + ".wav").exists()) {
                     previewMusic = Gdx.audio.newMusic(Gdx.files.internal(songName + ".wav"));
@@ -171,24 +171,24 @@ public class SongSelectScreen implements Screen {
         // CHANGE BACKGROUND BASED ON SONG
         if (selectedSongIndex == 0) {
             songPreviewBackground.setDrawable(
-                new Image(appleBackgroundTexture).getDrawable());
+                    new Image(appleBackgroundTexture).getDrawable());
         }
 
         else if (selectedSongIndex == 1) {
             songPreviewBackground.setDrawable(
-                new Image(beautyBackgroundTexture).getDrawable());
+                    new Image(beautyBackgroundTexture).getDrawable());
         }
 
         else if (selectedSongIndex == 2) {
             songPreviewBackground.setDrawable(
-                new Image(gentlemanBackgroundTexture).getDrawable());
+                    new Image(gentlemanBackgroundTexture).getDrawable());
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             if (previewMusic != null) {
                 previewMusic.stop();
             }
-            game.setScreen(new GameScreen(game, songNames[selectedSongIndex],bgNames[selectedSongIndex]));
+            game.setScreen(new GameScreen(game, songNames[selectedSongIndex], bgNames[selectedSongIndex]));
         }
 
         stage.act(delta);

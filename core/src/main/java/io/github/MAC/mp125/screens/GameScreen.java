@@ -127,6 +127,10 @@ public class GameScreen implements Screen {
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
+        Table characterTable = new Table();
+        characterTable.setFillParent(true);
+        stage.addActor(characterTable);
+
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         stage.addActor(rootTable);
@@ -279,11 +283,9 @@ public class GameScreen implements Screen {
         p1HitGradeImage.setVisible(false);
         p2HitGradeImage.setVisible(false);
 
-        rootTable.add(p1Sprite).width(150).height(150).expand().center();
-        rootTable.add().expand().center(); // spacer for the middle column
-        rootTable.add(p2Sprite).width(150).height(150).expand().center();
-
-        rootTable.row();
+        characterTable.add(p1Sprite).width(450).height(450).expand().center();
+        characterTable.add().expand().center(); // spacer for the middle column
+        characterTable.add(p2Sprite).width(450).height(450).expand().center();
         p1ScoreLabel = new Label("Score: 0", skin);
         p2ScoreLabel = new Label("Score: 0", skin);
         rootTable.add(p1ScoreLabel).expand().center().top();

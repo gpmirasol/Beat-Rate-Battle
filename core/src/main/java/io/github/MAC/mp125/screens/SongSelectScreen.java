@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -49,6 +50,10 @@ public class SongSelectScreen implements Screen {
 
     // overlay text
     private Label startBanner;
+
+    private Music previewMusic;
+    private int currentPlayingIndex = -1;
+    private float previewDelayTimer = 0f;
 
     public SongSelectScreen(Game game) {
         this.game = game;
@@ -119,11 +124,13 @@ public class SongSelectScreen implements Screen {
             selectedSongIndex--;
             if (selectedSongIndex < 0)
                 selectedSongIndex = 2;
+            previewDelayTimer = 0f;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
             selectedSongIndex++;
             if (selectedSongIndex > 2)
                 selectedSongIndex = 0;
+            previewDelayTimer = 0f;
         }
 
         song1Button.setColor(Color.WHITE);
@@ -136,6 +143,24 @@ public class SongSelectScreen implements Screen {
             song2Button.setColor(Color.GREEN);
         else if (selectedSongIndex == 2)
             song3Button.setColor(Color.GREEN);
+
+        if (currentPlayingIndex != selectedSongIndex) {
+            if (previewMusic != null) {
+                previewMusic.stop();
+                previewMusic.dispose();
+                previewMusic = null;
+            }
+            previewDelayTimer += delta;
+            if (previewDelayTimer >= 1.0f) {
+                String songName = songNames[selectedSongIndex];
+                if (Gdx.files.internal(songName + ".wav").exists()) {
+                    previewMusic = Gdx.audio.newMusic(Gdx.files.internal(songName + ".wav"));
+                    previewMusic.setLooping(true);
+                    previewMusic.play();
+                }
+                currentPlayingIndex = selectedSongIndex;
+            }
+        }
 
         // CHANGE BACKGROUND BASED ON SONG
         if (selectedSongIndex == 0) {
@@ -154,6 +179,9 @@ public class SongSelectScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            if (previewMusic != null) {
+                previewMusic.stop();
+            }
             game.setScreen(new GameScreen(game, songNames[selectedSongIndex],bgNames[selectedSongIndex]));
         }
 
@@ -178,6 +206,9 @@ public class SongSelectScreen implements Screen {
 
     @Override
     public void hide() {
+        if (previewMusic != null) {
+            previewMusic.stop();
+        }
     }
 
     @Override
@@ -187,5 +218,8 @@ public class SongSelectScreen implements Screen {
         appleBackgroundTexture.dispose();
         beautyBackgroundTexture.dispose();
         gentlemanBackgroundTexture.dispose();
+        if (previewMusic != null) {
+            previewMusic.dispose();
+        }
     }
 }

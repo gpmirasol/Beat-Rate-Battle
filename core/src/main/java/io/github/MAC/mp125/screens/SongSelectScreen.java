@@ -52,7 +52,6 @@ public class SongSelectScreen implements Screen {
     private Image song2Button;
     private Image song3Button;
 
-
     // overlay text
     private Texture startBannerTexture;
     private Image startBanner;
@@ -119,7 +118,7 @@ public class SongSelectScreen implements Screen {
 
         rootTable.add(startBanner)
                 .colspan(1)
-                .size(300,100)
+                .size(300, 100)
                 .center()
                 .padBottom(40);
 

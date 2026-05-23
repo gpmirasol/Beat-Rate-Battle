@@ -26,9 +26,9 @@ public class HowToPlay implements Screen {
     private int page = 0;
 
     private String[] slides = {
-        "howtoplay1.png",
-        "howtoplay2.png",
-        "howtoplay3.png"
+            "howtoplay1.png",
+            "howtoplay2.png",
+            "howtoplay3.png"
     };
 
     public HowToPlay(Game game) {
@@ -87,10 +87,8 @@ public class HowToPlay implements Screen {
 
     private void updateImage() {
         image.setDrawable(
-            new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(
-                new Texture(Gdx.files.internal(slides[page]))
-            )
-        );
+                new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(
+                        new Texture(Gdx.files.internal(slides[page]))));
     }
 
     @Override
@@ -107,9 +105,17 @@ public class HowToPlay implements Screen {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() {}
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

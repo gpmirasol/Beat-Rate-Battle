@@ -89,6 +89,9 @@ public class GameScreen implements Screen {
     private boolean isGameOver = false;
     private float gameOverTimer = 0f;
     private Label p1EndLabel, p2EndLabel;
+    
+    private Music countdownAudio;
+    private boolean isCountingDown = false;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -304,7 +307,17 @@ public class GameScreen implements Screen {
         // Load and play music
         if (Gdx.files.internal(songName + ".wav").exists()) {
             backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(songName + ".wav"));
-            backgroundMusic.play();
+        }
+
+        if (Gdx.files.internal("Countdown.wav").exists()) {
+            countdownAudio = Gdx.audio.newMusic(Gdx.files.internal("Countdown.wav"));
+            countdownAudio.play();
+            isCountingDown = true;
+        } else {
+            isCountingDown = false;
+            if (backgroundMusic != null) {
+                backgroundMusic.play();
+            }
         }
 
         p1Notes = smParser.parseChart(songName + "_easy.sm", 1);
@@ -644,7 +657,14 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (isGameOver) {
+        if (isCountingDown) {
+            if (countdownAudio != null && !countdownAudio.isPlaying()) {
+                isCountingDown = false;
+                if (backgroundMusic != null) {
+                    backgroundMusic.play();
+                }
+            }
+        } else if (isGameOver) {
             gameOverTimer += delta;
             if (gameOverTimer >= 3.0f) {
                 game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
@@ -899,6 +919,9 @@ public class GameScreen implements Screen {
         if (backgroundMusic != null) {
             backgroundMusic.stop(); // Ensure music stops playing when the screen is hidden
         }
+        if (countdownAudio != null) {
+            countdownAudio.stop();
+        }
     }
 
     @Override
@@ -923,6 +946,9 @@ public class GameScreen implements Screen {
         }
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
+        }
+        if (countdownAudio != null) {
+            countdownAudio.dispose();
         }
         if (texLeft != null)
             texLeft.dispose();

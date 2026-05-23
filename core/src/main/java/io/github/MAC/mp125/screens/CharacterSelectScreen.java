@@ -29,7 +29,9 @@ public class CharacterSelectScreen implements Screen {
     private Table rootTable;
 
     // get ready for battle banner
-    private Label battleBanner;
+    private Texture battleBannerTexture;
+    private Image battleBanner;
+    private boolean battleBannerbool;
 
     // remember sprite selected
     public static int selectedP1SpriteIndex = 0;
@@ -41,6 +43,8 @@ public class CharacterSelectScreen implements Screen {
     private Texture[] characterSprites;
     private int p1SpriteIndex = 0;
     private int p2SpriteIndex = 0;
+    private Texture p1ControlsTexture;
+    private Texture p2ControlsTexture;
 
     public CharacterSelectScreen(Game game) {
         this.game = game;
@@ -86,8 +90,8 @@ public class CharacterSelectScreen implements Screen {
         p2Label.setAlignment(Align.center);
 
         // READY LABEL
-        battleBanner = new Label("PRESS ENTER TO CONTINUE", skin);
-        battleBanner.setAlignment(Align.center);
+        battleBannerTexture =  new Texture(Gdx.files.internal("buttonpresstocontinue.png"));
+        Image battleBanner = new Image(battleBannerTexture);
 
         // LAYOUT
 
@@ -125,30 +129,28 @@ public class CharacterSelectScreen implements Screen {
 
         rootTable.row();
 
-        // CONTROLS TEXT
-        Label p1Controls = new Label("A / D", skin);
-        Label p2Controls = new Label("LEFT / RIGHT", skin);
-
-        p1Controls.setAlignment(Align.center);
-        p2Controls.setAlignment(Align.center);
+        p1ControlsTexture = new Texture(Gdx.files.internal("buttonAD.png"));
+        p2ControlsTexture = new Texture(Gdx.files.internal("buttonleftright.png"));
+        Image p1Controls = new Image(p1ControlsTexture);
+        Image p2Controls = new Image(p2ControlsTexture);
 
         rootTable.add(p1Controls)
                 .left()
-                .padLeft(220)
-                .padBottom(20);
+                .size(300, 100)
+                .padLeft(220);
 
         rootTable.add(p2Controls)
                 .right()
-                .padRight(180)
-                .padBottom(20);
+                .size(300, 100)
+                .padRight(180);
 
         rootTable.row();
 
-        // ENTER LABEL
         rootTable.add(battleBanner)
                 .colspan(2)
+                .size(300, 100)
                 .center()
-                .padBottom(40);
+                .padBottom(100);
 
         System.out.println("Character Select Screen");
     }
@@ -196,7 +198,7 @@ public class CharacterSelectScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             selectedP1SpriteIndex = p1SpriteIndex;
             selectedP2SpriteIndex = p2SpriteIndex;
-            battleBanner.setVisible(true);
+            battleBannerbool = true;
             game.setScreen(new SongSelectScreen(game));
         }
 
@@ -231,6 +233,12 @@ public class CharacterSelectScreen implements Screen {
             for (Texture tex : characterSprites) {
                 tex.dispose();
             }
+        }
+        if (p1ControlsTexture != null) {
+            p1ControlsTexture.dispose();
+        }
+        if (p2ControlsTexture != null) {
+            p2ControlsTexture.dispose();
         }
     }
 }

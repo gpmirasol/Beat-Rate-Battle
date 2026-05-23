@@ -84,7 +84,7 @@ public class ResultsScreen implements Screen {
         // BACK BUTTON
         // =========================
 
-        TextButton backButton = new TextButton("BACK TO MENU", skin);
+        Image backButton = new Image(new Texture(Gdx.files.internal("buttonbacktomenu.png")));
 
         backButton.addListener(new ClickListener() {
             @Override
@@ -93,7 +93,9 @@ public class ResultsScreen implements Screen {
             }
         });
 
-        root.add(backButton).colspan(3).padTop(40);
+        root.add(backButton).colspan(3)
+                            .size(300,100)
+                            .padTop(40);
     }
 
     // =========================

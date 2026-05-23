@@ -89,7 +89,7 @@ public class GameScreen implements Screen {
     private boolean isGameOver = false;
     private float gameOverTimer = 0f;
     private Label p1EndLabel, p2EndLabel;
-    
+
     private Music countdownAudio;
     private boolean isCountingDown = false;
 
@@ -364,15 +364,15 @@ public class GameScreen implements Screen {
                     switch (grade) {
                         case PERFECT:
                             points = 50;
-                            hpChange = 2f;
+                            hpChange = 1.0f;
                             break;
                         case GOOD:
                             points = 30;
-                            hpChange = 1f;
+                            hpChange = 0.5f;
                             break;
                         case MEH:
                             points = 10;
-                            hpChange = 0.5f;
+                            hpChange = 0.25f;
                             break;
                         default:
                             break;
@@ -479,7 +479,7 @@ public class GameScreen implements Screen {
         if (!hitRegistered) {
             if (isP1) {
                 p1Stats.recordMiss();
-                health -= 2f;
+                health -= 1f;
                 p1MissTimer = 0.3f;
                 p1CurrentIndAnim = indAnimMiss;
                 p1IndStateTime = 0f;
@@ -489,7 +489,7 @@ public class GameScreen implements Screen {
                 p1StreakImage.setVisible(false);
             } else {
                 p2Stats.recordMiss();
-                health += 2f;
+                health += 1f;
                 p2MissTimer = 0.3f;
                 p2CurrentIndAnim = indAnimMiss;
                 p2IndStateTime = 0f;
@@ -543,7 +543,7 @@ public class GameScreen implements Screen {
                 iterator.remove();
                 if (isP1) {
                     p1Stats.recordMiss();
-                    health -= 2f;
+                    health -= 1f;
                     p1MissTimer = 0.3f;
                     p1CurrentIndAnim = indAnimMiss;
                     p1IndStateTime = 0f;
@@ -553,7 +553,7 @@ public class GameScreen implements Screen {
                     p1StreakImage.setVisible(false);
                 } else {
                     p2Stats.recordMiss();
-                    health += 2f;
+                    health += 1f;
                     p2MissTimer = 0.3f;
                     p2CurrentIndAnim = indAnimMiss;
                     p2IndStateTime = 0f;
@@ -591,7 +591,7 @@ public class GameScreen implements Screen {
                     iterator.remove();
                     if (isP1) {
                         p1Stats.recordMiss();
-                        health -= 2f;
+                        health -= 1f;
                         p1MissTimer = 0.3f;
                         p1CurrentIndAnim = indAnimMiss;
                         p1IndStateTime = 0f;
@@ -601,7 +601,7 @@ public class GameScreen implements Screen {
                         p1StreakImage.setVisible(false);
                     } else {
                         p2Stats.recordMiss();
-                        health += 2f;
+                        health += 1f;
                         p2MissTimer = 0.3f;
                         p2CurrentIndAnim = indAnimMiss;
                         p2IndStateTime = 0f;
@@ -616,11 +616,11 @@ public class GameScreen implements Screen {
                     if (isP1) {
                         int holdPoints = (p2HardModeTimer > 0) ? 20 : 10;
                         p1Score += holdPoints;
-                        health += 1f;
+                        health += 0.5f;
                     } else {
                         int holdPoints = (p1HardModeTimer > 0) ? 20 : 10;
                         p2Score += holdPoints;
-                        health -= 1f;
+                        health -= 0.5f;
                     }
                     continue;
                 }

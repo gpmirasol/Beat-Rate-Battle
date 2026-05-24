@@ -87,6 +87,10 @@ public class GameScreen implements Screen {
     private int p2PerfectStreak = 0;
     private float p1HardModeTimer = 0f;
     private float p2HardModeTimer = 0f;
+    private float p1DebuffCooldownTimer = 0f;
+    private float p2DebuffCooldownTimer = 0f;
+    private ProgressBar p1DebuffBar;
+    private ProgressBar p2DebuffBar;
     private io.github.MAC.mp125.PlayerStats p1Stats = new io.github.MAC.mp125.PlayerStats();
     private io.github.MAC.mp125.PlayerStats p2Stats = new io.github.MAC.mp125.PlayerStats();
     private long totalSongDurationMs = 0;
@@ -118,7 +122,7 @@ public class GameScreen implements Screen {
     private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
 
     // Spritesheets
-    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "kooaspritesheet.png"};
+    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "kooaspritesheet.png" };
     String p1SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP1SpriteIndex];
     String p2SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP2SpriteIndex];
 
@@ -219,6 +223,14 @@ public class GameScreen implements Screen {
         p2StreakImage.setVisible(false);
         middleTable.add(p1StreakImage).padRight(20).padTop(10).width(80).height(40);
         middleTable.add(p2StreakImage).padLeft(20).padTop(10).width(80).height(40);
+
+        middleTable.row();
+        p1DebuffBar = new ProgressBar(0f, 10f, 0.1f, false, skin);
+        p2DebuffBar = new ProgressBar(0f, 10f, 0.1f, false, skin);
+        p1DebuffBar.setAnimateDuration(0.1f);
+        p2DebuffBar.setAnimateDuration(0.1f);
+        middleTable.add(p1DebuffBar).padRight(20).padTop(10).width(100);
+        middleTable.add(p2DebuffBar).padLeft(20).padTop(10).width(100);
 
         rootTable.add(middleTable).expand().center().top();
 
@@ -455,13 +467,18 @@ public class GameScreen implements Screen {
                         p1Stats.score = p1Score;
                         health += hpChange;
                         if (grade == HitGrade.PERFECT) {
-                            p1PerfectStreak++;
-                            if (p1PerfectStreak == 10) {
-                                setOpponentChart(false, true);
-                                p2HardModeTimer = 3.0f;
+                            if (p1DebuffCooldownTimer <= 0) {
+                                p1PerfectStreak++;
+                                if (p1PerfectStreak == 10) {
+                                    setOpponentChart(false, true);
+                                    p2HardModeTimer = 3.0f;
+                                    p1DebuffCooldownTimer = 10.0f;
+                                }
+                                if (p1PerfectStreak > 10)
+                                    p1PerfectStreak = 1;
+                            } else {
+                                p1PerfectStreak = 0;
                             }
-                            if (p1PerfectStreak > 10)
-                                p1PerfectStreak = 1;
                         } else {
                             p1PerfectStreak = 0;
                         }
@@ -501,13 +518,18 @@ public class GameScreen implements Screen {
                         p2Stats.score = p2Score;
                         health -= hpChange;
                         if (grade == HitGrade.PERFECT) {
-                            p2PerfectStreak++;
-                            if (p2PerfectStreak == 10) {
-                                setOpponentChart(true, true);
-                                p1HardModeTimer = 5.0f;
+                            if (p2DebuffCooldownTimer <= 0) {
+                                p2PerfectStreak++;
+                                if (p2PerfectStreak == 10) {
+                                    setOpponentChart(true, true);
+                                    p1HardModeTimer = 3.0f;
+                                    p2DebuffCooldownTimer = 10.0f;
+                                }
+                                if (p2PerfectStreak > 10)
+                                    p2PerfectStreak = 1;
+                            } else {
+                                p2PerfectStreak = 0;
                             }
-                            if (p2PerfectStreak > 10)
-                                p2PerfectStreak = 1;
                         } else {
                             p2PerfectStreak = 0;
                         }
@@ -788,6 +810,26 @@ public class GameScreen implements Screen {
                         p2HardModeTimer = 0f;
                         setOpponentChart(false, false);
                     }
+                }
+
+                if (p1DebuffCooldownTimer > 0) {
+                    p1DebuffCooldownTimer -= delta;
+                    if (p1DebuffCooldownTimer <= 0) {
+                        p1DebuffCooldownTimer = 0f;
+                    }
+                    p1DebuffBar.setValue(p1DebuffCooldownTimer);
+                } else {
+                    p1DebuffBar.setValue(p1PerfectStreak);
+                }
+
+                if (p2DebuffCooldownTimer > 0) {
+                    p2DebuffCooldownTimer -= delta;
+                    if (p2DebuffCooldownTimer <= 0) {
+                        p2DebuffCooldownTimer = 0f;
+                    }
+                    p2DebuffBar.setValue(p2DebuffCooldownTimer);
+                } else {
+                    p2DebuffBar.setValue(p2PerfectStreak);
                 }
 
                 // Update P1 Keys

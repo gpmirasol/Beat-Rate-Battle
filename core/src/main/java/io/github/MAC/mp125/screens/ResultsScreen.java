@@ -152,9 +152,9 @@ public class ResultsScreen implements Screen {
         backgroundTable.setFillParent(true);
         stage.addActor(backgroundTable);
 
-        backgroundTable.add(p1Container).expandX().left().pad(20).padBottom(40);
+        backgroundTable.add(p1Container).expandX().left().top().pad(20).padTop(10);
         backgroundTable.add().expandX();
-        backgroundTable.add(p2Container).expandX().right().pad(20).padBottom(40);
+        backgroundTable.add(p2Container).expandX().right().top().pad(20).padTop(10);
 
         // =========================
         // ROOT LAYOUT (FOREGROUND)

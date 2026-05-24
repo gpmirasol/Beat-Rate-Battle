@@ -122,6 +122,8 @@ public class GameScreen implements Screen {
     private TextureRegionDrawable drawLeft, drawDown, drawUp, drawRight;
     private TextureRegionDrawable drawPressedLeft, drawPressedDown, drawPressedUp, drawPressedRight;
     private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
+    private Texture p1ChibiTex, p2ChibiTex;
+    private Image p1ChibiImage, p2ChibiImage;
 
     // Spritesheets
     String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "aleianspritesheet.png" };
@@ -414,12 +416,23 @@ public class GameScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
                 if (game instanceof io.github.MAC.mp125.MainMendoza) {
-                    ((io.github.MAC.mp125.MainMendoza)game).fadeInBGM();
+                    ((io.github.MAC.mp125.MainMendoza) game).fadeInBGM();
                 }
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }
         });
+
+        String p1ChibiName = p1SpriteChoice.replace("spritesheet", "chibi");
+        String p2ChibiName = p2SpriteChoice.replace("spritesheet", "chibi");
+        p1ChibiTex = new Texture(Gdx.files.internal(p1ChibiName));
+        p2ChibiTex = new Texture(Gdx.files.internal(p2ChibiName));
+        p1ChibiImage = new Image(p1ChibiTex);
+        p2ChibiImage = new Image(p2ChibiTex);
+        p1ChibiImage.setSize(125, 125);
+        p2ChibiImage.setSize(125, 125);
+        stage.addActor(p1ChibiImage);
+        stage.addActor(p2ChibiImage);
 
         System.out.println("Game Screen Started");
     }
@@ -1011,6 +1024,20 @@ public class GameScreen implements Screen {
             stage.act(delta);
             overlayStage.act(delta);
 
+            com.badlogic.gdx.math.Vector2 hbPos = healthBar
+                    .localToStageCoordinates(new com.badlogic.gdx.math.Vector2(0, 0));
+            float hbWidth = healthBar.getWidth();
+            float knobX = hbPos.x + healthBar.getVisualPercent() * hbWidth;
+            float hbCenterY = hbPos.y + healthBar.getHeight() / 2f;
+
+            if (p1ChibiImage != null) {
+                p1ChibiImage.setPosition(knobX - p1ChibiImage.getWidth() + 35,
+                        hbCenterY - p1ChibiImage.getHeight() / 2f);
+            }
+            if (p2ChibiImage != null) {
+                p2ChibiImage.setPosition(knobX - 35, hbCenterY - p2ChibiImage.getHeight() / 2f);
+            }
+
         } // End of !isPaused block
 
         stage.draw();
@@ -1149,6 +1176,10 @@ public class GameScreen implements Screen {
             flyTexUp.dispose();
         if (flyTexRight != null)
             flyTexRight.dispose();
+        if (p1ChibiTex != null)
+            p1ChibiTex.dispose();
+        if (p2ChibiTex != null)
+            p2ChibiTex.dispose();
     }
 
     private void drawHoldBodies(ConcurrentLinkedQueue<GameNote> notes, float startX) {

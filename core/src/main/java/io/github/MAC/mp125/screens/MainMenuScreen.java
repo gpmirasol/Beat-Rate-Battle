@@ -47,7 +47,7 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        Texture bgTexture = new Texture(Gdx.files.internal("bg.png"));
+        Texture bgTexture = new Texture(Gdx.files.internal("mainmenubg.png"));
         background = new Image(bgTexture);
         background.setFillParent(true);
         stage.addActor(background);
@@ -56,7 +56,7 @@ public class MainMenuScreen implements Screen {
         table.setFillParent(true);
         stage.addActor(table);
 
-        table.center();
+        table.bottom();
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
@@ -68,7 +68,7 @@ public class MainMenuScreen implements Screen {
 
         table.add(playButton).width(250).height(80).pad(10);
         table.row();
-        table.add(howToPlayButton).width(250).height(80);
+        table.add(howToPlayButton).width(250).height(80).padBottom(50);
 
         playButton.addListener(new ClickListener() {
             @Override

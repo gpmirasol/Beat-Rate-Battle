@@ -129,6 +129,9 @@ public class SongSelectScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (game instanceof io.github.MAC.mp125.MainMendoza) {
+                ((io.github.MAC.mp125.MainMendoza)game).fadeInBGM();
+            }
             game.setScreen(new CharacterSelectScreen(game));
             dispose();
             return;
@@ -170,6 +173,11 @@ public class SongSelectScreen implements Screen {
                 if (Gdx.files.internal(songName + ".wav").exists()) {
                     previewMusic = Gdx.audio.newMusic(Gdx.files.internal(songName + ".wav"));
                     previewMusic.setLooping(true);
+                    
+                    if (game instanceof io.github.MAC.mp125.MainMendoza) {
+                        ((io.github.MAC.mp125.MainMendoza)game).fadeOutBGM();
+                    }
+                    
                     previewMusic.play();
                 }
                 currentPlayingIndex = selectedSongIndex;
@@ -195,6 +203,9 @@ public class SongSelectScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             if (previewMusic != null) {
                 previewMusic.stop();
+            }
+            if (game instanceof io.github.MAC.mp125.MainMendoza) {
+                ((io.github.MAC.mp125.MainMendoza)game).stopBGM();
             }
             game.setScreen(new GameScreen(game, songNames[selectedSongIndex], bgNames[selectedSongIndex]));
         }

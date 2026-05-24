@@ -413,6 +413,9 @@ public class GameScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
+                if (game instanceof io.github.MAC.mp125.MainMendoza) {
+                    ((io.github.MAC.mp125.MainMendoza)game).fadeInBGM();
+                }
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }

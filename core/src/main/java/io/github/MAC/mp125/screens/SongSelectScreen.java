@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.audio.Sound;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -59,6 +60,7 @@ public class SongSelectScreen implements Screen {
     private Music previewMusic;
     private int currentPlayingIndex = -1;
     private float previewDelayTimer = 0f;
+    private Sound scrollSound;
 
     public SongSelectScreen(Game game) {
         this.game = game;
@@ -71,6 +73,7 @@ public class SongSelectScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        scrollSound = Gdx.audio.newSound(Gdx.files.internal("scrollSound.ogg"));
 
         // BACKGROUND TEXTURES
         appleBackgroundTexture = new Texture(Gdx.files.internal("applebackground.png"));
@@ -138,12 +141,14 @@ public class SongSelectScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            scrollSound.play();
             selectedSongIndex--;
             if (selectedSongIndex < 0)
                 selectedSongIndex = 2;
             previewDelayTimer = 0f;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            scrollSound.play();
             selectedSongIndex++;
             if (selectedSongIndex > 2)
                 selectedSongIndex = 0;
@@ -245,6 +250,9 @@ public class SongSelectScreen implements Screen {
         gentlemanBackgroundTexture.dispose();
         if (previewMusic != null) {
             previewMusic.dispose();
+        }
+        if (scrollSound != null) {
+            scrollSound.dispose();
         }
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.audio.Sound;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -45,6 +46,7 @@ public class CharacterSelectScreen implements Screen {
     private int p2SpriteIndex = 0;
     private Texture p1ControlsTexture;
     private Texture p2ControlsTexture;
+    private Sound scrollSound;
 
     public CharacterSelectScreen(Game game) {
         this.game = game;
@@ -57,6 +59,7 @@ public class CharacterSelectScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        scrollSound = Gdx.audio.newSound(Gdx.files.internal("scrollSound.ogg"));
 
         // BACKGROUND
         Texture bgTexture = new Texture(Gdx.files.internal("CharacterSelectScreenBg.png"));
@@ -169,12 +172,14 @@ public class CharacterSelectScreen implements Screen {
 
         // P1 Image Carousel
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            scrollSound.play();
             p1SpriteIndex--;
             if (p1SpriteIndex < 0)
                 p1SpriteIndex = characterSprites.length - 1;
             p1Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p1SpriteIndex])));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            scrollSound.play();
             p1SpriteIndex++;
             if (p1SpriteIndex >= characterSprites.length)
                 p1SpriteIndex = 0;
@@ -183,12 +188,14 @@ public class CharacterSelectScreen implements Screen {
 
         // P2 Image Carousel
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            scrollSound.play();
             p2SpriteIndex--;
             if (p2SpriteIndex < 0)
                 p2SpriteIndex = characterSprites.length - 1;
             p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p2SpriteIndex])));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            scrollSound.play();
             p2SpriteIndex++;
             if (p2SpriteIndex >= characterSprites.length)
                 p2SpriteIndex = 0;
@@ -239,6 +246,9 @@ public class CharacterSelectScreen implements Screen {
         }
         if (p2ControlsTexture != null) {
             p2ControlsTexture.dispose();
+        }
+        if (scrollSound != null) {
+            scrollSound.dispose();
         }
     }
 }

@@ -52,7 +52,7 @@ public class ResultsScreen implements Screen {
         stage = new Stage(new FitViewport(1280, 720));
         Gdx.input.setInputProcessor(stage);
 
-        bgTexture = new Texture(Gdx.files.internal("mainmenubg.png"));
+        bgTexture = new Texture(Gdx.files.internal("resultscreenbg.png"));
         background = new Image(bgTexture);
         background.setFillParent(true);
         stage.addActor(background);

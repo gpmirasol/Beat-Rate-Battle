@@ -122,7 +122,7 @@ public class GameScreen implements Screen {
     private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
 
     // Spritesheets
-    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "kooaspritesheet.png" };
+    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "aleianspritesheet.png" };
     String p1SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP1SpriteIndex];
     String p2SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP2SpriteIndex];
 

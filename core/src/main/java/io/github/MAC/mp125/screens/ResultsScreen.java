@@ -63,23 +63,20 @@ public class ResultsScreen implements Screen {
         bgMusic.setLooping(true);
         bgMusic.play();
 
-        // =========================
-        // LOAD SPRITE ASSETS
-        // =========================
         numbersSheet = new Texture(Gdx.files.internal("numbersspritesheet.png"));
         TextureRegion[][] numTemp = TextureRegion.split(numbersSheet, numbersSheet.getWidth() / 2,
                 numbersSheet.getHeight() / 5);
         digitRegions = new TextureRegion[10];
-        digitRegions[0] = numTemp[4][1]; // '0'
-        digitRegions[1] = numTemp[0][0]; // '1'
-        digitRegions[2] = numTemp[0][1]; // '2'
-        digitRegions[3] = numTemp[1][0]; // '3'
-        digitRegions[4] = numTemp[1][1]; // '4'
-        digitRegions[5] = numTemp[2][0]; // '5'
-        digitRegions[6] = numTemp[2][1]; // '6'
-        digitRegions[7] = numTemp[3][0]; // '7'
-        digitRegions[8] = numTemp[3][1]; // '8'
-        digitRegions[9] = numTemp[4][0]; // '9'
+        digitRegions[0] = numTemp[4][1];
+        digitRegions[1] = numTemp[0][0];
+        digitRegions[2] = numTemp[0][1];
+        digitRegions[3] = numTemp[1][0];
+        digitRegions[4] = numTemp[1][1];
+        digitRegions[5] = numTemp[2][0];
+        digitRegions[6] = numTemp[2][1];
+        digitRegions[7] = numTemp[3][0];
+        digitRegions[8] = numTemp[3][1];
+        digitRegions[9] = numTemp[4][0];
 
         resultsSheet = new Texture(Gdx.files.internal("resultsspritesheet.png"));
         TextureRegion[][] resTemp = TextureRegion.split(resultsSheet, resultsSheet.getWidth(),

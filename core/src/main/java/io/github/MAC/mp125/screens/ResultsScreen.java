@@ -91,8 +91,10 @@ public class ResultsScreen implements Screen {
 
         String[] characterPortraitswin = { "meerawin.png", "kooawin.png", "aleianwin.png" };
         String[] characterPortraitslose = { "meeralose.png", "kooalose.png", "aleianlose.png" };
-        String win = characterPortraitswin[CharacterSelectScreen.selectedP1SpriteIndex];
-        String lose = characterPortraitslose[CharacterSelectScreen.selectedP2SpriteIndex];
+        String p1Win = characterPortraitswin[CharacterSelectScreen.selectedP1SpriteIndex];
+        String p1Lose = characterPortraitslose[CharacterSelectScreen.selectedP1SpriteIndex];
+        String p2Win = characterPortraitswin[CharacterSelectScreen.selectedP2SpriteIndex];
+        String p2Lose = characterPortraitslose[CharacterSelectScreen.selectedP2SpriteIndex];
 
         // =========================
         // PORTRAIT CONTAINERS (LEFT & RIGHT)
@@ -100,16 +102,16 @@ public class ResultsScreen implements Screen {
         Image p1Outcome = null;
         Image p2Outcome = null;
 
-        if (p1Stats.score > p2Stats.score) {
+        if (p1Stats.score >= p2Stats.score) {
             p1Outcome = new Image(winBanner);
             p2Outcome = new Image(loseBanner);
-            p1PortraitTex = new Texture(Gdx.files.internal(win));
-            p2PortraitTex = new Texture(Gdx.files.internal(lose));
-        } else if (p2Stats.score > p1Stats.score) {
+            p1PortraitTex = new Texture(Gdx.files.internal(p1Win));
+            p2PortraitTex = new Texture(Gdx.files.internal(p2Lose));
+        } else {
             p1Outcome = new Image(loseBanner);
             p2Outcome = new Image(winBanner);
-            p1PortraitTex = new Texture(Gdx.files.internal(lose));
-            p2PortraitTex = new Texture(Gdx.files.internal(win));
+            p1PortraitTex = new Texture(Gdx.files.internal(p1Lose));
+            p2PortraitTex = new Texture(Gdx.files.internal(p2Win));
         }
 
         Table p1Container = new Table();

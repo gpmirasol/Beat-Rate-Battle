@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -138,8 +138,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
-        overlayStage = new Stage(new ScreenViewport());
+        stage = new Stage(new FitViewport(1280, 720));
+        overlayStage = new Stage(new FitViewport(1280, 720));
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         bgTexture = new Texture(Gdx.files.internal(bgName + "background.png"));
@@ -370,7 +370,7 @@ public class GameScreen implements Screen {
         }
         totalSongDurationMs += 2000; // Pad end by 2 seconds
 
-        pauseStage = new Stage(new ScreenViewport());
+        pauseStage = new Stage(new FitViewport(1280, 720));
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(0f, 0f, 0f, 0.7f);
         pixmap.fill();

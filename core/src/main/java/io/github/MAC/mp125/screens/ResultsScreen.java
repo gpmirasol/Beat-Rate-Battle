@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class ResultsScreen implements Screen {
 
@@ -47,7 +47,7 @@ public class ResultsScreen implements Screen {
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new FitViewport(1280, 720));
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
@@ -160,7 +160,7 @@ public class ResultsScreen implements Screen {
                     bgMusic.stop();
                 }
                 if (game instanceof io.github.MAC.mp125.MainMendoza) {
-                    ((io.github.MAC.mp125.MainMendoza)game).fadeInBGM();
+                    ((io.github.MAC.mp125.MainMendoza) game).fadeInBGM();
                 }
                 game.setScreen(new MainMenuScreen(game));
             }

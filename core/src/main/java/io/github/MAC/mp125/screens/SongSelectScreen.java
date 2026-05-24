@@ -20,7 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class SongSelectScreen implements Screen {
     private Game game;
@@ -70,7 +70,7 @@ public class SongSelectScreen implements Screen {
     @Override
     public void show() {
 
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new FitViewport(1280, 720));
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));

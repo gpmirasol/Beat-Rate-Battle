@@ -78,7 +78,7 @@ public class GameScreen implements Screen {
     private Animation<TextureRegion> p1AnimIdle, p2AnimIdle;
     private Image p1Sprite, p2Sprite;
 
-    private Label p1ScoreLabel, p2ScoreLabel;
+    // Score labels removed for visual clarity
     private Image p1StreakImage, p2StreakImage;
     private Texture indicatorSpriteSheet;
     private TextureRegion[] counterFrames;
@@ -187,10 +187,10 @@ public class GameScreen implements Screen {
         dBtn = new Image(texRight);
 
         Table p1Table = new Table();
-        p1Table.add(aBtn).width(60).height(60).pad(5);
-        p1Table.add(sBtn).width(60).height(60).pad(5);
-        p1Table.add(wBtn).width(60).height(60).pad(5);
-        p1Table.add(dBtn).width(60).height(60).pad(5);
+        p1Table.add(aBtn).width(90).height(90).pad(2);
+        p1Table.add(sBtn).width(90).height(90).pad(2);
+        p1Table.add(wBtn).width(90).height(90).pad(2);
+        p1Table.add(dBtn).width(90).height(90).pad(2);
 
         // Player 2 Buttons (Arrows)
         upBtn = new Image(texUp);
@@ -199,13 +199,13 @@ public class GameScreen implements Screen {
         rightBtn = new Image(texRight);
 
         Table p2Table = new Table();
-        p2Table.add(leftBtn).width(60).height(60).pad(5);
-        p2Table.add(downBtn).width(60).height(60).pad(5);
-        p2Table.add(upBtn).width(60).height(60).pad(5);
-        p2Table.add(rightBtn).width(60).height(60).pad(5);
+        p2Table.add(leftBtn).width(90).height(90).pad(2);
+        p2Table.add(downBtn).width(90).height(90).pad(2);
+        p2Table.add(upBtn).width(90).height(90).pad(2);
+        p2Table.add(rightBtn).width(90).height(90).pad(2);
 
         // Add to root table
-        rootTable.add(p1Table).expand().left().pad(50).top();
+        rootTable.add(p1Table).expand().center().padTop(50).top();
 
         healthBar = new ProgressBar(0f, 100f, 0.01f, false, skin);
         healthBar.setValue(health);
@@ -215,10 +215,12 @@ public class GameScreen implements Screen {
         middleTable.add(healthBar).colspan(2).center().top().padTop(70).width(300);
         middleTable.row();
 
-        p1HitGradeImage = new Image();
-        p2HitGradeImage = new Image();
-        middleTable.add(p1HitGradeImage).padRight(20).padTop(20).width(100).height(100);
-        middleTable.add(p2HitGradeImage).padLeft(20).padTop(20).width(100).height(100);
+        p1DebuffBar = new ProgressBar(0f, 10f, 0.1f, false, skin);
+        p2DebuffBar = new ProgressBar(0f, 10f, 0.1f, false, skin);
+        p1DebuffBar.setAnimateDuration(0.1f);
+        p2DebuffBar.setAnimateDuration(0.1f);
+        middleTable.add(p1DebuffBar).padRight(20).padTop(20).width(100);
+        middleTable.add(p2DebuffBar).padLeft(20).padTop(20).width(100);
 
         middleTable.row();
         p1StreakImage = new Image();
@@ -229,18 +231,25 @@ public class GameScreen implements Screen {
         middleTable.add(p2StreakImage).padLeft(20).padTop(10).width(80).height(40);
 
         middleTable.row();
-        p1DebuffBar = new ProgressBar(0f, 10f, 0.1f, false, skin);
-        p2DebuffBar = new ProgressBar(0f, 10f, 0.1f, false, skin);
-        p1DebuffBar.setAnimateDuration(0.1f);
-        p2DebuffBar.setAnimateDuration(0.1f);
-        middleTable.add(p1DebuffBar).padRight(20).padTop(10).width(100);
-        middleTable.add(p2DebuffBar).padLeft(20).padTop(10).width(100);
+        p1HitGradeImage = new Image();
+        p2HitGradeImage = new Image();
+        com.badlogic.gdx.scenes.scene2d.Group p1GradeGroup = new com.badlogic.gdx.scenes.scene2d.Group();
+        p1GradeGroup.setSize(150, 150);
+        p1HitGradeImage.setSize(150, 150);
+        p1GradeGroup.addActor(p1HitGradeImage);
+
+        com.badlogic.gdx.scenes.scene2d.Group p2GradeGroup = new com.badlogic.gdx.scenes.scene2d.Group();
+        p2GradeGroup.setSize(150, 150);
+        p2HitGradeImage.setSize(150, 150);
+        p2GradeGroup.addActor(p2HitGradeImage);
+
+        middleTable.add(p1GradeGroup).padRight(20).padTop(10).width(150).height(150);
+        middleTable.add(p2GradeGroup).padLeft(20).padTop(10).width(150).height(150);
 
         rootTable.add(middleTable).expand().center().top();
 
-        rootTable.add(p2Table).expand().right().pad(50).top();
+        rootTable.add(p2Table).expand().center().padTop(50).top();
 
-        // Placeholders for player sprites | TODO: @grace Change Image/s for Sprites
         rootTable.row();
         // Load Sprite Sheets
         p1SpriteSheet = new Texture(Gdx.files.internal(p1SpriteChoice));
@@ -312,14 +321,9 @@ public class GameScreen implements Screen {
         p1HitGradeImage.setVisible(false);
         p2HitGradeImage.setVisible(false);
 
-        characterTable.add(p1Sprite).width(450).height(450).expand().center();
+        characterTable.add(p1Sprite).width(450).height(450).expand().center().padTop(100);
         characterTable.add().expand().center(); // spacer for the middle column
-        characterTable.add(p2Sprite).width(450).height(450).expand().center();
-        p1ScoreLabel = new Label("Score: 0", skin);
-        p2ScoreLabel = new Label("Score: 0", skin);
-        rootTable.add(p1ScoreLabel).expand().center().top();
-        rootTable.add().expand().center();
-        rootTable.add(p2ScoreLabel).expand().center().top();
+        characterTable.add(p2Sprite).width(450).height(450).expand().center().padTop(100);
 
         // Create end game overlay layout
         Table overlayTable = new Table();
@@ -484,11 +488,11 @@ public class GameScreen implements Screen {
                         p1Stats.recordHit(grade);
                         if (p2HardModeTimer > 0)
                             points *= 2;
-                            
+
                         if (p1HardModeTimer > 0) {
                             hpChange = 0; // Ghost Notes: Hits during debuff don't heal
                         }
-                        
+
                         p1Score += points;
                         p1Stats.score = p1Score;
                         health += hpChange;
@@ -534,17 +538,17 @@ public class GameScreen implements Screen {
                                 break;
                         }
                         p1IndStateTime = 0f;
-                        p1HitGradeImage.setVisible(true);
+                        playFloatingAnimation(p1HitGradeImage);
                         p1LabelTimer = 1.0f;
                     } else {
                         p2Stats.recordHit(grade);
                         if (p1HardModeTimer > 0)
                             points *= 2;
-                            
+
                         if (p2HardModeTimer > 0) {
                             hpChange = 0; // Ghost Notes: Hits during debuff don't heal
                         }
-                        
+
                         p2Score += points;
                         p2Stats.score = p2Score;
                         health -= hpChange;
@@ -590,7 +594,7 @@ public class GameScreen implements Screen {
                                 break;
                         }
                         p2IndStateTime = 0f;
-                        p2HitGradeImage.setVisible(true);
+                        playFloatingAnimation(p2HitGradeImage);
                         p2LabelTimer = 1.0f;
                     }
                     hitRegistered = true;
@@ -606,7 +610,7 @@ public class GameScreen implements Screen {
                 p1MissTimer = 0.3f;
                 p1CurrentIndAnim = indAnimMiss;
                 p1IndStateTime = 0f;
-                p1HitGradeImage.setVisible(true);
+                playFloatingAnimation(p1HitGradeImage);
                 p1LabelTimer = 1.0f;
                 p1PerfectStreak = 0;
                 p1StreakImage.setVisible(false);
@@ -616,7 +620,7 @@ public class GameScreen implements Screen {
                 p2MissTimer = 0.3f;
                 p2CurrentIndAnim = indAnimMiss;
                 p2IndStateTime = 0f;
-                p2HitGradeImage.setVisible(true);
+                playFloatingAnimation(p2HitGradeImage);
                 p2LabelTimer = 1.0f;
                 p2PerfectStreak = 0;
                 p2StreakImage.setVisible(false);
@@ -671,7 +675,7 @@ public class GameScreen implements Screen {
                         p1MissTimer = 0.3f;
                         p1CurrentIndAnim = indAnimMiss;
                         p1IndStateTime = 0f;
-                        p1HitGradeImage.setVisible(true);
+                        playFloatingAnimation(p1HitGradeImage);
                         p1LabelTimer = 1.0f;
                         p1PerfectStreak = 0;
                         p1StreakImage.setVisible(false);
@@ -681,7 +685,7 @@ public class GameScreen implements Screen {
                         p2MissTimer = 0.3f;
                         p2CurrentIndAnim = indAnimMiss;
                         p2IndStateTime = 0f;
-                        p2HitGradeImage.setVisible(true);
+                        playFloatingAnimation(p2HitGradeImage);
                         p2LabelTimer = 1.0f;
                         p2PerfectStreak = 0;
                         p2StreakImage.setVisible(false);
@@ -719,7 +723,7 @@ public class GameScreen implements Screen {
                             p1MissTimer = 0.3f;
                             p1CurrentIndAnim = indAnimMiss;
                             p1IndStateTime = 0f;
-                            p1HitGradeImage.setVisible(true);
+                            playFloatingAnimation(p1HitGradeImage);
                             p1LabelTimer = 1.0f;
                             p1PerfectStreak = 0;
                             p1StreakImage.setVisible(false);
@@ -729,7 +733,7 @@ public class GameScreen implements Screen {
                             p2MissTimer = 0.3f;
                             p2CurrentIndAnim = indAnimMiss;
                             p2IndStateTime = 0f;
-                            p2HitGradeImage.setVisible(true);
+                            playFloatingAnimation(p2HitGradeImage);
                             p2LabelTimer = 1.0f;
                             p2PerfectStreak = 0;
                             p2StreakImage.setVisible(false);
@@ -892,9 +896,6 @@ public class GameScreen implements Screen {
                     processHitAttempt(p2Notes, 2, false);
                 if (rightPressed)
                     processHitAttempt(p2Notes, 3, false);
-
-                p1ScoreLabel.setText("Score: " + p1Score);
-                p2ScoreLabel.setText("Score: " + p2Score);
 
                 // Clamp health
                 if (health >= 100)
@@ -1215,5 +1216,17 @@ public class GameScreen implements Screen {
                 shapeRenderer.rect(noteX + noteSize * 0.3f, endNoteY + noteSize * 0.5f, noteSize * 0.4f, height);
             }
         }
+    }
+
+    private void playFloatingAnimation(Image hitGradeImage) {
+        hitGradeImage.clearActions();
+        hitGradeImage.setPosition(0, 0);
+        hitGradeImage.getColor().a = 1.0f;
+        hitGradeImage.setVisible(true);
+        hitGradeImage.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence(
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel(
+                        com.badlogic.gdx.scenes.scene2d.actions.Actions.moveBy(0, 40, 1.0f),
+                        com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut(1.0f)),
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.visible(false)));
     }
 }

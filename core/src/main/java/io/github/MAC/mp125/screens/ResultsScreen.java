@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -35,6 +36,7 @@ public class ResultsScreen implements Screen {
 
     private TextureRegion[] digitRegions;
     private TextureRegion[] labelRegions;
+    private Sound clickSound;
 
     public ResultsScreen(Game game, io.github.MAC.mp125.PlayerStats p1Stats, io.github.MAC.mp125.PlayerStats p2Stats) {
         this.game = game;
@@ -48,6 +50,7 @@ public class ResultsScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
 
         // =========================
         // LOAD SPRITE ASSETS
@@ -146,6 +149,7 @@ public class ResultsScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 game.setScreen(new MainMenuScreen(game));
             }
         });
@@ -238,5 +242,6 @@ public class ResultsScreen implements Screen {
         if (loseBanner != null) loseBanner.dispose();
         if (p1PortraitTex != null) p1PortraitTex.dispose();
         if (p2PortraitTex != null) p2PortraitTex.dispose();
+        if (clickSound != null) clickSound.dispose();
     }
 }

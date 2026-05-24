@@ -31,6 +31,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.audio.Sound;
 
 public class GameScreen implements Screen {
     private Game game;
@@ -108,6 +109,7 @@ public class GameScreen implements Screen {
     private Texture blackPixelTexture;
     private Texture btnPlayTex;
     private Texture btnMenuTex;
+    private Sound clickSound;
 
     // P1 Keys
     private Image wBtn, aBtn, sBtn, dBtn;
@@ -381,6 +383,7 @@ public class GameScreen implements Screen {
 
         btnPlayTex = new Texture(Gdx.files.internal("buttonplay.png"));
         btnMenuTex = new Texture(Gdx.files.internal("buttonbacktomenu.png"));
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
 
         ImageButton resumeBtn = new ImageButton(new TextureRegionDrawable(btnPlayTex));
         ImageButton menuBtn = new ImageButton(new TextureRegionDrawable(btnMenuTex));
@@ -395,6 +398,7 @@ public class GameScreen implements Screen {
         resumeBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 isPaused = false;
                 isCountingDown = true;
                 if (countdownAudio != null) {
@@ -408,6 +412,7 @@ public class GameScreen implements Screen {
         menuBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }
@@ -1113,6 +1118,9 @@ public class GameScreen implements Screen {
         }
         if (countdownAudio != null) {
             countdownAudio.dispose();
+        }
+        if (clickSound != null) {
+            clickSound.dispose();
         }
         if (texLeft != null)
             texLeft.dispose();

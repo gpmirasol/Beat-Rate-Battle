@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -25,6 +26,7 @@ public class HowToPlay implements Screen {
     private Texture backTexture;
     private Image nextButton;
     private Image backButton;
+    private Sound clickSound;
 
     private int page = 0;
 
@@ -45,6 +47,7 @@ public class HowToPlay implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
 
         // IMAGE
         image = new Image(new Texture(Gdx.files.internal(slides[page])));
@@ -70,6 +73,7 @@ public class HowToPlay implements Screen {
         nextButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 if (page < slides.length - 1) {
                     page++;
                     updateImage();
@@ -83,6 +87,7 @@ public class HowToPlay implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 if (page > 0) {
                     page--;
                     updateImage();
@@ -140,6 +145,9 @@ public class HowToPlay implements Screen {
         }
         if (backTexture != null) {
             backTexture.dispose();
+        }
+        if (clickSound != null) {
+            clickSound.dispose();
         }
     }
 }

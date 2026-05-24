@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.audio.Sound;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -26,6 +27,7 @@ public class MainMenuScreen implements Screen {
     private Stage stage;
     private Table table;
     private Image background;
+    private Sound clickSound;
 
     private ImageButton playButton;
     private Texture playTexture;
@@ -57,6 +59,7 @@ public class MainMenuScreen implements Screen {
         table.center();
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
 
         playTexture = new Texture(Gdx.files.internal("buttonplay.png"));
         playButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(playTexture)));
@@ -70,6 +73,7 @@ public class MainMenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 game.setScreen(new CharacterSelectScreen(game));
             }
         });
@@ -77,6 +81,7 @@ public class MainMenuScreen implements Screen {
         howToPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 game.setScreen(new HowToPlay(game));
             }
         });
@@ -116,6 +121,9 @@ public class MainMenuScreen implements Screen {
         skin.dispose();
         if (playTexture != null) {
             playTexture.dispose();
+        }
+        if (clickSound != null) {
+            clickSound.dispose();
         }
     }
 }

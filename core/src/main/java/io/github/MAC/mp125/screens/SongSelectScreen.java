@@ -117,13 +117,13 @@ public class SongSelectScreen implements Screen {
         // center banner layout
         Table bannerTable = new Table();
         bannerTable.setFillParent(true);
-        bannerTable.center();
+        bannerTable.bottom();
         stage.addActor(bannerTable);
 
         startBannerTexture = new Texture(Gdx.files.internal("buttonpresstocontinue.png"));
         startBanner = new Image(startBannerTexture);
 
-        bannerTable.add(startBanner).size(300, 100);
+        bannerTable.add(startBanner).size(300, 100).padBottom(20);
 
         System.out.println("Song Select Screen");
     }

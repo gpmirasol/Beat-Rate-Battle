@@ -44,8 +44,6 @@ public class CharacterSelectScreen implements Screen {
     private Texture[] characterSprites;
     private int p1SpriteIndex = 0;
     private int p2SpriteIndex = 0;
-    private Texture p1ControlsTexture;
-    private Texture p2ControlsTexture;
     private Sound scrollSound;
     private Sound confirmSound;
 
@@ -87,33 +85,11 @@ public class CharacterSelectScreen implements Screen {
         p1Sprite = new Image(characterSprites[0]);
         p2Sprite = new Image(characterSprites[0]);
 
-        // PLAYER LABELS
-        Label p1Label = new Label("PLAYER 1", skin);
-        Label p2Label = new Label("PLAYER 2", skin);
-
-        p1Label.setAlignment(Align.center);
-        p2Label.setAlignment(Align.center);
-
         // READY LABEL
         battleBannerTexture = new Texture(Gdx.files.internal("buttonpresstocontinue.png"));
         Image battleBanner = new Image(battleBannerTexture);
 
         // LAYOUT
-
-        // TOP LABELS
-        rootTable.add(p1Label)
-                .expandX()
-                .left()
-                .padLeft(120)
-                .padTop(40);
-
-        rootTable.add(p2Label)
-                .expandX()
-                .right()
-                .padRight(120)
-                .padTop(40);
-
-        rootTable.row();
 
         // BIG CHARACTER SPRITES
         rootTable.add(p1Sprite)
@@ -122,7 +98,7 @@ public class CharacterSelectScreen implements Screen {
                 .expand()
                 .left()
                 .padLeft(50)
-                .padTop(20);
+                .padBottom(13);
 
         rootTable.add(p2Sprite)
                 .width(500)
@@ -130,24 +106,7 @@ public class CharacterSelectScreen implements Screen {
                 .expand()
                 .right()
                 .padRight(50)
-                .padTop(20);
-
-        rootTable.row();
-
-        p1ControlsTexture = new Texture(Gdx.files.internal("buttonAD.png"));
-        p2ControlsTexture = new Texture(Gdx.files.internal("buttonleftright.png"));
-        Image p1Controls = new Image(p1ControlsTexture);
-        Image p2Controls = new Image(p2ControlsTexture);
-
-        rootTable.add(p1Controls)
-                .left()
-                .size(300, 100)
-                .padLeft(220);
-
-        rootTable.add(p2Controls)
-                .right()
-                .size(300, 100)
-                .padRight(180);
+                .padBottom(13);
 
         rootTable.row();
 
@@ -155,7 +114,7 @@ public class CharacterSelectScreen implements Screen {
                 .colspan(2)
                 .size(300, 100)
                 .center()
-                .padBottom(100);
+                .padBottom(20);
 
         System.out.println("Character Select Screen");
     }
@@ -243,12 +202,6 @@ public class CharacterSelectScreen implements Screen {
             for (Texture tex : characterSprites) {
                 tex.dispose();
             }
-        }
-        if (p1ControlsTexture != null) {
-            p1ControlsTexture.dispose();
-        }
-        if (p2ControlsTexture != null) {
-            p2ControlsTexture.dispose();
         }
         if (scrollSound != null) {
             scrollSound.dispose();

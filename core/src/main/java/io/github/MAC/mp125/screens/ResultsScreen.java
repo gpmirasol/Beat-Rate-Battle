@@ -56,7 +56,8 @@ public class ResultsScreen implements Screen {
         // LOAD SPRITE ASSETS
         // =========================
         numbersSheet = new Texture(Gdx.files.internal("numbersspritesheet.png"));
-        TextureRegion[][] numTemp = TextureRegion.split(numbersSheet, numbersSheet.getWidth() / 2, numbersSheet.getHeight() / 5);
+        TextureRegion[][] numTemp = TextureRegion.split(numbersSheet, numbersSheet.getWidth() / 2,
+                numbersSheet.getHeight() / 5);
         digitRegions = new TextureRegion[10];
         digitRegions[0] = numTemp[4][1]; // '0'
         digitRegions[1] = numTemp[0][0]; // '1'
@@ -70,7 +71,8 @@ public class ResultsScreen implements Screen {
         digitRegions[9] = numTemp[4][0]; // '9'
 
         resultsSheet = new Texture(Gdx.files.internal("resultsspritesheet.png"));
-        TextureRegion[][] resTemp = TextureRegion.split(resultsSheet, resultsSheet.getWidth(), resultsSheet.getHeight() / 7);
+        TextureRegion[][] resTemp = TextureRegion.split(resultsSheet, resultsSheet.getWidth(),
+                resultsSheet.getHeight() / 7);
         labelRegions = new TextureRegion[7];
         for (int i = 0; i < 7; i++) {
             labelRegions[i] = resTemp[i][0];
@@ -91,7 +93,7 @@ public class ResultsScreen implements Screen {
         // =========================
         Table p1Container = new Table();
         Image p1Portrait = new Image(p1PortraitTex);
-        
+
         Table p2Container = new Table();
         Image p2Portrait = new Image(p2PortraitTex);
 
@@ -120,12 +122,12 @@ public class ResultsScreen implements Screen {
         // STATS TABLE (CENTER)
         // =========================
         Table statsTable = new Table();
-        statsTable.add(makeRow(labelRegions[0], p1Stats.totalNotes, p2Stats.totalNotes)).row();
-        statsTable.add(makeRow(labelRegions[1], p1Stats.maxCombo, p2Stats.maxCombo)).row();
-        statsTable.add(makeRow(labelRegions[2], p1Stats.perfects, p2Stats.perfects)).row();
-        statsTable.add(makeRow(labelRegions[3], p1Stats.goods, p2Stats.goods)).row();
-        statsTable.add(makeRow(labelRegions[4], p1Stats.mehs, p2Stats.mehs)).row();
-        statsTable.add(makeRow(labelRegions[5], p1Stats.misses, p2Stats.misses)).row();
+        statsTable.add(makeRow(labelRegions[0], p1Stats.totalNotes, p2Stats.totalNotes)).padBottom(-20).row();
+        statsTable.add(makeRow(labelRegions[1], p1Stats.maxCombo, p2Stats.maxCombo)).padBottom(-20).row();
+        statsTable.add(makeRow(labelRegions[2], p1Stats.perfects, p2Stats.perfects)).padBottom(-20).row();
+        statsTable.add(makeRow(labelRegions[3], p1Stats.goods, p2Stats.goods)).padBottom(-20).row();
+        statsTable.add(makeRow(labelRegions[4], p1Stats.mehs, p2Stats.mehs)).padBottom(-20).row();
+        statsTable.add(makeRow(labelRegions[5], p1Stats.misses, p2Stats.misses)).padBottom(30).row();
 
         statsTable.add(makeScoreRow(labelRegions[6], p1Stats.score, p2Stats.score));
 
@@ -136,9 +138,9 @@ public class ResultsScreen implements Screen {
         root.setFillParent(true);
         stage.addActor(root);
 
-        root.add(p1Container).expandX().left().pad(30);
-        root.add(statsTable).expand().center();
-        root.add(p2Container).expandX().right().pad(30);
+        root.add(p1Container).expandX().left().pad(30).padTop(100);
+        root.add(statsTable).expand().center().padTop(100);
+        root.add(p2Container).expandX().right().pad(30).padTop(100);
 
         root.row();
 
@@ -155,8 +157,8 @@ public class ResultsScreen implements Screen {
         });
 
         root.add(backButton).colspan(3)
-                            .size(300, 100)
-                            .padTop(40);
+                .size(300, 100)
+                .padTop(40);
     }
 
     private Table renderNumber(int number, TextureRegion[] digitRegions, float scale) {
@@ -179,17 +181,17 @@ public class ResultsScreen implements Screen {
     private Table makeRow(TextureRegion labelRegion, int p1Val, int p2Val) {
         Table row = new Table();
 
-        Table leftNum = renderNumber(p1Val, digitRegions, 0.14f);
-        
-        float labelWidth = (float) resultsSheet.getWidth() * 0.20f;
-        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.20f;
+        Table leftNum = renderNumber(p1Val, digitRegions, 0.28f);
+
+        float labelWidth = (float) resultsSheet.getWidth() * 0.40f;
+        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.40f;
         Image labelImg = new Image(new TextureRegionDrawable(labelRegion));
 
-        Table rightNum = renderNumber(p2Val, digitRegions, 0.14f);
+        Table rightNum = renderNumber(p2Val, digitRegions, 0.28f);
 
-        row.add(leftNum).width(80).right().padRight(20);
+        row.add(leftNum).width(160).right().padRight(20);
         row.add(labelImg).size(labelWidth, labelHeight).center();
-        row.add(rightNum).width(80).left().padLeft(20);
+        row.add(rightNum).width(160).left().padLeft(20);
 
         return row;
     }
@@ -197,17 +199,17 @@ public class ResultsScreen implements Screen {
     private Table makeScoreRow(TextureRegion labelRegion, int p1Val, int p2Val) {
         Table row = new Table();
 
-        Table leftNum = renderNumber(p1Val, digitRegions, 0.20f);
-        
-        float labelWidth = (float) resultsSheet.getWidth() * 0.28f;
-        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.28f;
+        Table leftNum = renderNumber(p1Val, digitRegions, 0.40f);
+
+        float labelWidth = (float) resultsSheet.getWidth() * 0.56f;
+        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.56f;
         Image labelImg = new Image(new TextureRegionDrawable(labelRegion));
 
-        Table rightNum = renderNumber(p2Val, digitRegions, 0.20f);
+        Table rightNum = renderNumber(p2Val, digitRegions, 0.40f);
 
-        row.add(leftNum).width(100).right().padRight(20);
+        row.add(leftNum).width(200).right().padRight(20);
         row.add(labelImg).size(labelWidth, labelHeight).center();
-        row.add(rightNum).width(100).left().padLeft(20);
+        row.add(rightNum).width(200).left().padLeft(20);
 
         return row;
     }
@@ -228,20 +230,35 @@ public class ResultsScreen implements Screen {
         }
     }
 
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() {}
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
 
     @Override
     public void dispose() {
         stage.dispose();
         skin.dispose();
-        if (numbersSheet != null) numbersSheet.dispose();
-        if (resultsSheet != null) resultsSheet.dispose();
-        if (winBanner != null) winBanner.dispose();
-        if (loseBanner != null) loseBanner.dispose();
-        if (p1PortraitTex != null) p1PortraitTex.dispose();
-        if (p2PortraitTex != null) p2PortraitTex.dispose();
-        if (clickSound != null) clickSound.dispose();
+        if (numbersSheet != null)
+            numbersSheet.dispose();
+        if (resultsSheet != null)
+            resultsSheet.dispose();
+        if (winBanner != null)
+            winBanner.dispose();
+        if (loseBanner != null)
+            loseBanner.dispose();
+        if (p1PortraitTex != null)
+            p1PortraitTex.dispose();
+        if (p2PortraitTex != null)
+            p2PortraitTex.dispose();
+        if (clickSound != null)
+            clickSound.dispose();
     }
 }

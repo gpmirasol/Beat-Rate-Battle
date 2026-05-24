@@ -89,7 +89,7 @@ public class ResultsScreen implements Screen {
         winBanner = new Texture(Gdx.files.internal("labelyouwin.png"));
         loseBanner = new Texture(Gdx.files.internal("labelyoulose.png"));
 
-        String[] characterPortraits = { "meeracharsel.png", "kooacharsel.png", "aleiancharsel.png" };
+        String[] characterPortraits = { "meerabig.png", "kooabig.png", "aleianbig.png" };
         String p1Choice = characterPortraits[CharacterSelectScreen.selectedP1SpriteIndex];
         String p2Choice = characterPortraits[CharacterSelectScreen.selectedP2SpriteIndex];
 
@@ -117,14 +117,14 @@ public class ResultsScreen implements Screen {
         }
 
         if (p1Outcome != null) {
-            p1Container.add(p1Outcome).size(180, 60).padBottom(5).row();
+            p1Container.add(p1Outcome).size(180, 60).padBottom(-20).row();
         }
-        p1Container.add(p1Portrait).size(340, 340);
+        p1Container.add(p1Portrait).size(400, 400);
 
         if (p2Outcome != null) {
-            p2Container.add(p2Outcome).size(180, 60).padBottom(5).row();
+            p2Container.add(p2Outcome).size(180, 60).padBottom(-20).row();
         }
-        p2Container.add(p2Portrait).size(340, 340);
+        p2Container.add(p2Portrait).size(400, 400);
 
         p1Container.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
         p2Container.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
@@ -133,12 +133,13 @@ public class ResultsScreen implements Screen {
         // STATS TABLE (CENTER)
         // =========================
         Table statsTable = new Table();
-        statsTable.add(makeRow(labelRegions[0], p1Stats.totalNotes, p2Stats.totalNotes)).padBottom(-20).row();
+        statsTable.add(makeRow(labelRegions[0], p1Stats.totalNotes, p2Stats.totalNotes)).padTop(50).padBottom(-20)
+                .row();
         statsTable.add(makeRow(labelRegions[1], p1Stats.maxCombo, p2Stats.maxCombo)).padBottom(-20).row();
         statsTable.add(makeRow(labelRegions[2], p1Stats.perfects, p2Stats.perfects)).padBottom(-20).row();
         statsTable.add(makeRow(labelRegions[3], p1Stats.goods, p2Stats.goods)).padBottom(-20).row();
         statsTable.add(makeRow(labelRegions[4], p1Stats.mehs, p2Stats.mehs)).padBottom(-20).row();
-        statsTable.add(makeRow(labelRegions[5], p1Stats.misses, p2Stats.misses)).padBottom(30).row();
+        statsTable.add(makeRow(labelRegions[5], p1Stats.misses, p2Stats.misses)).padBottom(-20).row();
 
         statsTable.add(makeScoreRow(labelRegions[6], p1Stats.score, p2Stats.score));
 
@@ -149,9 +150,9 @@ public class ResultsScreen implements Screen {
         backgroundTable.setFillParent(true);
         stage.addActor(backgroundTable);
 
-        backgroundTable.add(p1Container).expandX().left().pad(20).padTop(40);
+        backgroundTable.add(p1Container).expandX().left().pad(20).padBottom(40);
         backgroundTable.add().expandX();
-        backgroundTable.add(p2Container).expandX().right().pad(20).padTop(40);
+        backgroundTable.add(p2Container).expandX().right().pad(20).padBottom(40);
 
         // =========================
         // ROOT LAYOUT (FOREGROUND)

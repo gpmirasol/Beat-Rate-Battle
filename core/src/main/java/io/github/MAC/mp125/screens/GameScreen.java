@@ -776,7 +776,9 @@ public class GameScreen implements Screen {
                         break;
                 }
                 float noteX = startX + (note.laneIndex * laneWidth);
-                stage.getBatch().draw(texToDraw, noteX, noteY, noteSize, noteSize);
+                if (!note.isBeingHeld) {
+                    stage.getBatch().draw(texToDraw, noteX, noteY, noteSize, noteSize);
+                }
             }
         }
     }
@@ -1202,7 +1204,7 @@ public class GameScreen implements Screen {
                 float endTimeRemaining = note.endTimeMs - currentSongTimeMs;
                 float endNoteY = receptorY - (endTimeRemaining * scrollSpeedFactor);
 
-                if (note.isBeingHeld || noteY > receptorY) {
+                if (note.isBeingHeld) {
                     noteY = receptorY;
                 }
 
@@ -1212,7 +1214,24 @@ public class GameScreen implements Screen {
 
                 float noteX = startX + (note.laneIndex * laneWidth);
 
-                shapeRenderer.setColor(0.5f, 0.8f, 1f, 0.7f); // Semi-transparent blue
+                switch (note.laneIndex) {
+                    case 0:
+                        shapeRenderer.setColor(0.9f, 0.2f, 0.6f, 0.7f); // Pink
+                        break;
+                    case 1:
+                        shapeRenderer.setColor(0.2f, 0.6f, 1.0f, 0.7f); // Blue
+                        break;
+                    case 2:
+                        shapeRenderer.setColor(0.3f, 0.9f, 0.3f, 0.7f); // Green
+                        break;
+                    case 3:
+                        shapeRenderer.setColor(0.9f, 0.3f, 0.2f, 0.7f); // Orange/Red
+                        break;
+                    default:
+                        shapeRenderer.setColor(0.5f, 0.8f, 1f, 0.7f);
+                        break;
+                }
+
                 shapeRenderer.rect(noteX + noteSize * 0.3f, endNoteY + noteSize * 0.5f, noteSize * 0.4f, height);
             }
         }

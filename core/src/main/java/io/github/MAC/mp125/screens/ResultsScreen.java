@@ -37,6 +37,7 @@ public class ResultsScreen implements Screen {
     private TextureRegion[] digitRegions;
     private TextureRegion[] labelRegions;
     private Sound clickSound;
+    private com.badlogic.gdx.audio.Music bgMusic;
 
     public ResultsScreen(Game game, io.github.MAC.mp125.PlayerStats p1Stats, io.github.MAC.mp125.PlayerStats p2Stats) {
         this.game = game;
@@ -51,6 +52,9 @@ public class ResultsScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
+        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("resultsMusic.ogg"));
+        bgMusic.setLooping(true);
+        bgMusic.play();
 
         // =========================
         // LOAD SPRITE ASSETS
@@ -152,6 +156,9 @@ public class ResultsScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
+                if (bgMusic != null) {
+                    bgMusic.stop();
+                }
                 if (game instanceof io.github.MAC.mp125.MainMendoza) {
                     ((io.github.MAC.mp125.MainMendoza)game).fadeInBGM();
                 }
@@ -263,5 +270,7 @@ public class ResultsScreen implements Screen {
             p2PortraitTex.dispose();
         if (clickSound != null)
             clickSound.dispose();
+        if (bgMusic != null)
+            bgMusic.dispose();
     }
 }

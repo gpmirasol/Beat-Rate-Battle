@@ -484,6 +484,11 @@ public class GameScreen implements Screen {
                         p1Stats.recordHit(grade);
                         if (p2HardModeTimer > 0)
                             points *= 2;
+                            
+                        if (p1HardModeTimer > 0) {
+                            hpChange = 0; // Ghost Notes: Hits during debuff don't heal
+                        }
+                        
                         p1Score += points;
                         p1Stats.score = p1Score;
                         health += hpChange;
@@ -535,6 +540,11 @@ public class GameScreen implements Screen {
                         p2Stats.recordHit(grade);
                         if (p1HardModeTimer > 0)
                             points *= 2;
+                            
+                        if (p2HardModeTimer > 0) {
+                            hpChange = 0; // Ghost Notes: Hits during debuff don't heal
+                        }
+                        
                         p2Score += points;
                         p2Stats.score = p2Score;
                         health -= hpChange;

@@ -33,11 +33,13 @@ public class ResultsScreen implements Screen {
     private Texture loseBanner;
     private Texture p1PortraitTex;
     private Texture p2PortraitTex;
+    private Texture bgTexture;
 
     private TextureRegion[] digitRegions;
     private TextureRegion[] labelRegions;
     private Sound clickSound;
     private com.badlogic.gdx.audio.Music bgMusic;
+    private Image background;
 
     public ResultsScreen(Game game, io.github.MAC.mp125.PlayerStats p1Stats, io.github.MAC.mp125.PlayerStats p2Stats) {
         this.game = game;
@@ -49,6 +51,11 @@ public class ResultsScreen implements Screen {
     public void show() {
         stage = new Stage(new FitViewport(1280, 720));
         Gdx.input.setInputProcessor(stage);
+
+        bgTexture = new Texture(Gdx.files.internal("mainmenubg.png"));
+        background = new Image(bgTexture);
+        background.setFillParent(true);
+        stage.addActor(background);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         clickSound = Gdx.audio.newSound(Gdx.files.internal("clickButton.ogg"));
@@ -113,14 +120,17 @@ public class ResultsScreen implements Screen {
         }
 
         if (p1Outcome != null) {
-            p1Container.add(p1Outcome).size(150, 50).padBottom(10).row();
+            p1Container.add(p1Outcome).size(180, 60).padBottom(5).row();
         }
-        p1Container.add(p1Portrait).size(220, 220);
+        p1Container.add(p1Portrait).size(340, 340);
 
         if (p2Outcome != null) {
-            p2Container.add(p2Outcome).size(150, 50).padBottom(10).row();
+            p2Container.add(p2Outcome).size(180, 60).padBottom(5).row();
         }
-        p2Container.add(p2Portrait).size(220, 220);
+        p2Container.add(p2Portrait).size(340, 340);
+
+        p1Container.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
+        p2Container.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
 
         // =========================
         // STATS TABLE (CENTER)
@@ -136,15 +146,24 @@ public class ResultsScreen implements Screen {
         statsTable.add(makeScoreRow(labelRegions[6], p1Stats.score, p2Stats.score));
 
         // =========================
-        // ROOT LAYOUT
+        // PORTRAIT BACKGROUND LAYOUT
+        // =========================
+        Table backgroundTable = new Table();
+        backgroundTable.setFillParent(true);
+        stage.addActor(backgroundTable);
+
+        backgroundTable.add(p1Container).expandX().left().pad(20).padTop(40);
+        backgroundTable.add().expandX();
+        backgroundTable.add(p2Container).expandX().right().pad(20).padTop(40);
+
+        // =========================
+        // ROOT LAYOUT (FOREGROUND)
         // =========================
         Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
 
-        root.add(p1Container).expandX().left().pad(30).padTop(100);
-        root.add(statsTable).expand().center().padTop(100);
-        root.add(p2Container).expandX().right().pad(30).padTop(100);
+        root.add(statsTable).expand().center().padTop(50);
 
         root.row();
 
@@ -167,8 +186,9 @@ public class ResultsScreen implements Screen {
         });
 
         root.add(backButton).colspan(3)
-                .size(300, 100)
-                .padTop(40);
+                .size(240, 80)
+                .padTop(10)
+                .padBottom(20);
     }
 
     private Table renderNumber(int number, TextureRegion[] digitRegions, float scale) {
@@ -193,8 +213,8 @@ public class ResultsScreen implements Screen {
 
         Table leftNum = renderNumber(p1Val, digitRegions, 0.28f);
 
-        float labelWidth = (float) resultsSheet.getWidth() * 0.40f;
-        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.40f;
+        float labelWidth = (float) resultsSheet.getWidth() * 0.20f;
+        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.20f;
         Image labelImg = new Image(new TextureRegionDrawable(labelRegion));
 
         Table rightNum = renderNumber(p2Val, digitRegions, 0.28f);
@@ -211,8 +231,8 @@ public class ResultsScreen implements Screen {
 
         Table leftNum = renderNumber(p1Val, digitRegions, 0.40f);
 
-        float labelWidth = (float) resultsSheet.getWidth() * 0.56f;
-        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.56f;
+        float labelWidth = (float) resultsSheet.getWidth() * 0.3f;
+        float labelHeight = ((float) resultsSheet.getHeight() / 7f) * 0.3f;
         Image labelImg = new Image(new TextureRegionDrawable(labelRegion));
 
         Table rightNum = renderNumber(p2Val, digitRegions, 0.40f);
@@ -272,5 +292,7 @@ public class ResultsScreen implements Screen {
             clickSound.dispose();
         if (bgMusic != null)
             bgMusic.dispose();
+        if (bgTexture != null)
+            bgTexture.dispose();
     }
 }

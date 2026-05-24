@@ -89,7 +89,7 @@ public class ResultsScreen implements Screen {
         winBanner = new Texture(Gdx.files.internal("labelyouwin.png"));
         loseBanner = new Texture(Gdx.files.internal("labelyoulose.png"));
 
-        String[] characterPortraitswin = { "meeracharsel.png", "kooacharsel.png", "aleiancharsel.png" };
+        String[] characterPortraitswin = { "meerawin.png", "kooawin.png", "aleianwin.png" };
         String[] characterPortraitslose = { "meeralose.png", "kooalose.png", "aleianlose.png" };
         String win = characterPortraitswin[CharacterSelectScreen.selectedP1SpriteIndex];
         String lose = characterPortraitslose[CharacterSelectScreen.selectedP2SpriteIndex];

@@ -61,6 +61,7 @@ public class SongSelectScreen implements Screen {
     private int currentPlayingIndex = -1;
     private float previewDelayTimer = 0f;
     private Sound scrollSound;
+    private Sound confirmSound;
 
     public SongSelectScreen(Game game) {
         this.game = game;
@@ -74,6 +75,7 @@ public class SongSelectScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         scrollSound = Gdx.audio.newSound(Gdx.files.internal("scrollSound.ogg"));
+        confirmSound = Gdx.audio.newSound(Gdx.files.internal("confirmSound.wav"));
 
         // BACKGROUND TEXTURES
         appleBackgroundTexture = new Texture(Gdx.files.internal("applebackground.png"));
@@ -206,6 +208,7 @@ public class SongSelectScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            confirmSound.play();
             if (previewMusic != null) {
                 previewMusic.stop();
             }
@@ -253,6 +256,9 @@ public class SongSelectScreen implements Screen {
         }
         if (scrollSound != null) {
             scrollSound.dispose();
+        }
+        if (confirmSound != null) {
+            confirmSound.dispose();
         }
     }
 }

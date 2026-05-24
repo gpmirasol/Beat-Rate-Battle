@@ -47,6 +47,7 @@ public class CharacterSelectScreen implements Screen {
     private Texture p1ControlsTexture;
     private Texture p2ControlsTexture;
     private Sound scrollSound;
+    private Sound confirmSound;
 
     public CharacterSelectScreen(Game game) {
         this.game = game;
@@ -60,6 +61,7 @@ public class CharacterSelectScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         scrollSound = Gdx.audio.newSound(Gdx.files.internal("scrollSound.ogg"));
+        confirmSound = Gdx.audio.newSound(Gdx.files.internal("confirmSound.wav"));
 
         // BACKGROUND
         Texture bgTexture = new Texture(Gdx.files.internal("CharacterSelectScreenBg.png"));
@@ -203,6 +205,7 @@ public class CharacterSelectScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            confirmSound.play();
             selectedP1SpriteIndex = p1SpriteIndex;
             selectedP2SpriteIndex = p2SpriteIndex;
             battleBannerbool = true;
@@ -249,6 +252,9 @@ public class CharacterSelectScreen implements Screen {
         }
         if (scrollSound != null) {
             scrollSound.dispose();
+        }
+        if (confirmSound != null) {
+            confirmSound.dispose();
         }
     }
 }

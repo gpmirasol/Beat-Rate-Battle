@@ -821,7 +821,7 @@ public class GameScreen implements Screen {
             } else if (isGameOver) {
                 gameOverTimer += delta;
                 if (gameOverTimer >= 3.0f) {
-                    game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
+                    game.setScreen(new ResultsScreen(game, p1Stats, p2Stats, determineWinner()));
                     dispose();
                     return;
                 }
@@ -1027,7 +1027,7 @@ public class GameScreen implements Screen {
                     }
 
                     if (isFinished) {
-                        game.setScreen(new ResultsScreen(game, p1Stats, p2Stats));
+                        game.setScreen(new ResultsScreen(game, p1Stats, p2Stats, determineWinner()));
                         dispose();
                         return;
                     }
@@ -1247,5 +1247,12 @@ public class GameScreen implements Screen {
                         com.badlogic.gdx.scenes.scene2d.actions.Actions.moveBy(0, 40, 1.0f),
                         com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut(1.0f)),
                 com.badlogic.gdx.scenes.scene2d.actions.Actions.visible(false)));
+    }
+
+    private int determineWinner() {
+        if (health >= 100f) return 1;
+        if (health <= 0f) return 2;
+        if (p1Stats.score >= p2Stats.score) return 1;
+        return 2;
     }
 }

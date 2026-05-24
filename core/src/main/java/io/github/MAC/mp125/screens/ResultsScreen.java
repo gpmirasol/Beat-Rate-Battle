@@ -40,11 +40,13 @@ public class ResultsScreen implements Screen {
     private Sound clickSound;
     private com.badlogic.gdx.audio.Music bgMusic;
     private Image background;
+    private int winner;
 
-    public ResultsScreen(Game game, io.github.MAC.mp125.PlayerStats p1Stats, io.github.MAC.mp125.PlayerStats p2Stats) {
+    public ResultsScreen(Game game, io.github.MAC.mp125.PlayerStats p1Stats, io.github.MAC.mp125.PlayerStats p2Stats, int winner) {
         this.game = game;
         this.p1Stats = p1Stats != null ? p1Stats : new io.github.MAC.mp125.PlayerStats();
         this.p2Stats = p2Stats != null ? p2Stats : new io.github.MAC.mp125.PlayerStats();
+        this.winner = winner;
     }
 
     @Override
@@ -102,7 +104,7 @@ public class ResultsScreen implements Screen {
         Image p1Outcome = null;
         Image p2Outcome = null;
 
-        if (p1Stats.score >= p2Stats.score) {
+        if (winner == 1) {
             p1Outcome = new Image(winBanner);
             p2Outcome = new Image(loseBanner);
             p1PortraitTex = new Texture(Gdx.files.internal(p1Win));

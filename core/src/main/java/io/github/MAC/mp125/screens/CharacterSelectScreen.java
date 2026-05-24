@@ -185,7 +185,7 @@ public class CharacterSelectScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             p2SpriteIndex--;
             if (p2SpriteIndex < 0)
-                p2SpriteIndex = characterSprites.length - 1;
+                p2SpriteIndex = characterSprites.length - 12;
             p2Sprite.setDrawable(new TextureRegionDrawable(new TextureRegion(characterSprites[p2SpriteIndex])));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {

@@ -74,8 +74,7 @@ public class GameScreen implements Screen {
     private Animation<TextureRegion> indAnimPerfect, indAnimGood, indAnimMeh, indAnimMiss;
     private Animation<TextureRegion> p1CurrentIndAnim, p2CurrentIndAnim;
     private float p1IndStateTime = 0f, p2IndStateTime = 0f;
-    private Animation<TextureRegion> p1AnimIdle;
-    private TextureRegion p2IdleFrame;
+    private Animation<TextureRegion> p1AnimIdle, p2AnimIdle;
     private Image p1Sprite, p2Sprite;
 
     private Label p1ScoreLabel, p2ScoreLabel;
@@ -119,8 +118,7 @@ public class GameScreen implements Screen {
     private Texture flyTexLeft, flyTexDown, flyTexUp, flyTexRight;
 
     // Spritesheets
-    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "aleiancharsel.png",
-            "marisprite.png" };
+    String[] characterSpriteSheets = { "meeraspritesheet.png", "kooaspritesheet.png", "kooaspritesheet.png"};
     String p1SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP1SpriteIndex];
     String p2SpriteChoice = characterSpriteSheets[CharacterSelectScreen.selectedP2SpriteIndex];
 
@@ -258,13 +256,14 @@ public class GameScreen implements Screen {
                 p2Frames[index++] = p2Tmp[i][j];
             }
         }
-        p2AnimUp = new Animation<>(0.15f, p2Frames[4], p2Frames[5]);
-        p2AnimLeft = new Animation<>(0.15f, p2Frames[1], p2Frames[2]);
-        p2AnimDown = new Animation<>(0.15f, p2Frames[2], p2Frames[3]);
-        p2AnimRight = new Animation<>(0.15f, p2Frames[3], p2Frames[4]);
+
+        p2AnimIdle = new Animation<>(0.10f, p2Tmp[0]);
+        p2AnimUp = new Animation<>(0.15f, p2Tmp[1]);
+        p2AnimLeft = new Animation<>(0.15f, p2Tmp[2]);
+        p2AnimDown = new Animation<>(0.15f, p2Tmp[3]);
+        p2AnimRight = new Animation<>(0.15f, p2Tmp[4]);
         p2AnimMiss = new Animation<>(0.10f, p2Tmp[5]);
-        p2CurrentAnim = p2AnimUp;
-        p2IdleFrame = p2Frames[0];
+        p2CurrentAnim = p2AnimIdle;
 
         Texture counterSpriteSheet = new Texture(Gdx.files.internal("counterspritesheet.png"));
         TextureRegion[][] counterTmp = TextureRegion.split(counterSpriteSheet,
@@ -292,7 +291,7 @@ public class GameScreen implements Screen {
         p2CurrentIndAnim = indAnimPerfect;
 
         p1Sprite = new Image(p1AnimIdle.getKeyFrame(0));
-        p2Sprite = new Image(p2IdleFrame);
+        p2Sprite = new Image(p2AnimIdle.getKeyFrame(0));
 
         p1HitGradeImage.setVisible(false);
         p2HitGradeImage.setVisible(false);
@@ -890,13 +889,14 @@ public class GameScreen implements Screen {
                     p2Moving = true;
                 }
 
-                if (p2Moving) {
-                    p2StateTime += delta;
-                    p2Sprite.setDrawable(new TextureRegionDrawable(p2CurrentAnim.getKeyFrame(p2StateTime, true)));
-                } else {
-                    p2StateTime = 0f;
-                    p2Sprite.setDrawable(new TextureRegionDrawable(p2IdleFrame));
+                if (!p2Moving) {
+                    if (p2CurrentAnim != p2AnimIdle) {
+                        p2CurrentAnim = p2AnimIdle;
+                        p2StateTime = 0f; // Reset only once when switching to idle
+                    }
                 }
+                p2StateTime += delta;
+                p2Sprite.setDrawable(new TextureRegionDrawable(p2CurrentAnim.getKeyFrame(p2StateTime, true)));
 
                 if (p1LabelTimer > 0) {
                     p1LabelTimer -= delta;

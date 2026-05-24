@@ -33,7 +33,9 @@ public class HowToPlay implements Screen {
     private String[] slides = {
             "howtoplay1.png",
             "howtoplay2.png",
-            "howtoplay3.png"
+            "howtoplay3.png",
+            "howtoplay4.png",
+            "howtoplay5.png"
     };
 
     public HowToPlay(Game game) {
